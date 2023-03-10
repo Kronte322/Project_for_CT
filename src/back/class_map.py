@@ -1,33 +1,79 @@
 import pygame
+import random
+import time
 from src.back import map_generator
+
+random.seed(time.time())
 
 kSizeOfTile = 48
 kSizeOfMap = (128, 128)
 
-image_for_wall = pygame.image.load(
-    "../tile_sets/tiles_for_map/up_walls/sprite_001.png")
-default_image_size_for_wall = (kSizeOfTile, kSizeOfTile)
-image_for_wall = pygame.transform.scale(
-    image_for_wall, default_image_size_for_wall)
-image_rect_for_wall = image_for_wall.get_rect()
+kNumOfUpWalls = 3
+kNumOfDownWalls = 4
+kNumOfLeftWalls = 3
+kNumOfRightWalls = 3
+kNumOfFloors = 14
 
-image_for_floor = pygame.image.load(
-    "../tile_sets/tiles_for_map/floor/sprite_007.png")
-default_image_size_for_floor = (kSizeOfTile, kSizeOfTile)
-image_for_floor = pygame.transform.scale(
-    image_for_floor, default_image_size_for_wall)
-image_rect_for_floor = image_for_floor.get_rect()
+list_with_up_walls = []
+list_with_down_walls = []
+list_with_left_walls = []
+list_with_right_walls = []
+list_with_floor = []
 
 image_for_door = pygame.image.load(
     "../tile_sets/tiles_for_map/doors/sprite_066.png")
-default_image_size_for_door = (kSizeOfTile, kSizeOfTile)
 image_for_door = pygame.transform.scale(
-    image_for_door, default_image_size_for_wall)
-image_rect_for_door = image_for_door.get_rect()
+    image_for_door, (kSizeOfTile, kSizeOfTile))
+
+image_for_empty = pygame.image.load(
+    "../tile_sets/tiles_for_map/back_ground/sprite_078.png")
+image_for_empty = pygame.transform.scale(
+    image_for_empty, (kSizeOfTile, kSizeOfTile))
+
+image_for_left_down_in_corner = pygame.image.load(
+    "../tile_sets/tiles_for_map/left_down_corner/in_corner.png")
+image_for_left_down_in_corner = pygame.transform.scale(
+    image_for_left_down_in_corner, (kSizeOfTile, kSizeOfTile))
+
+image_for_left_down_out_corner = pygame.image.load(
+    "../tile_sets/tiles_for_map/left_down_corner/out_corner.png")
+image_for_left_down_out_corner = pygame.transform.scale(
+    image_for_left_down_out_corner, (kSizeOfTile, kSizeOfTile))
+
+image_for_right_down_in_corner = pygame.image.load(
+    "../tile_sets/tiles_for_map/right_down_corner/in_corner.png")
+image_for_right_down_in_corner = pygame.transform.scale(
+    image_for_right_down_in_corner, (kSizeOfTile, kSizeOfTile))
+
+image_for_right_down_out_corner = pygame.image.load(
+    "../tile_sets/tiles_for_map/right_down_corner/out_corner.png")
+image_for_right_down_out_corner = pygame.transform.scale(
+    image_for_right_down_out_corner, (kSizeOfTile, kSizeOfTile))
+
+
+def SetImage(path, number, size=kSizeOfTile):
+    result = pygame.image.load(path + str(number) + ".png")
+    result = pygame.transform.scale(result, (kSizeOfTile, kSizeOfTile))
+    return result
+
+
+def SetTiles():
+    for i in range(1, kNumOfUpWalls + 1):
+        list_with_up_walls.append(SetImage("../tile_sets/tiles_for_map/up_walls/sprite_", i))
+    for i in range(1, kNumOfDownWalls + 1):
+        list_with_down_walls.append(SetImage("../tile_sets/tiles_for_map/down_walls/sprite_", i))
+    for i in range(1, kNumOfRightWalls + 1):
+        list_with_right_walls.append(SetImage("../tile_sets/tiles_for_map/right_walls/sprite_", i))
+    for i in range(1, kNumOfLeftWalls + 1):
+        list_with_left_walls.append(SetImage("../tile_sets/tiles_for_map/left_walls/sprite_", i))
+    for i in range(1, kNumOfFloors + 1):
+        list_with_floor.append(SetImage("../tile_sets/tiles_for_map/floor/sprite_", i))
+
 
 
 class Map:
     def __init__(self):
+        SetTiles()
         self.map_generator = map_generator.MapGenerator()
         self.matrix_with_map = self.map_generator.GenerateMap(kSizeOfMap)
         self.mappa = pygame.Surface((kSizeOfMap[0] * kSizeOfTile, kSizeOfMap[1] * kSizeOfTile))
@@ -35,28 +81,27 @@ class Map:
         for i in range(len(self.matrix_with_map)):
             for tile in self.matrix_with_map[i]:
                 if tile in [map_generator.kFloor, map_generator.kPath]:
-                    image_rect_for_floor[0] = x
-                    image_rect_for_floor[1] = y
-                    self.mappa.blit(image_for_floor, image_rect_for_floor)
-                elif tile in [map_generator.kWall]:
-                    image_rect_for_wall[0] = x
-                    image_rect_for_wall[1] = y
-                    self.mappa.blit(image_for_wall, image_rect_for_wall)
-                elif tile == map_generator.kOneWidthPath:
-                    pygame.draw.rect(self.matrix_with_map, (196, 29, 29),
-                                     ((x, y), (kSizeOfTile, kSizeOfTile)))
-                elif tile == map_generator.kSign:
-                    pygame.draw.rect(self.matrix_with_map, (255, 0, 0),
-                                     ((x, y), (kSizeOfTile, kSizeOfTile)))
+                    self.mappa.blit(random.choice(list_with_floor), (x, y))
                 elif tile == map_generator.kDoor:
-                    image_rect_for_door[0] = x
-                    image_rect_for_door[1] = y
-                    self.mappa.blit(image_for_door, image_rect_for_door)
-                # elif tile == mapgen.kPath:
-                #   pygame.draw.rect(mappa, (255, 0, 0),
-                #                    ((x, y), (kSizeOfTile, kSizeOfTile)))
+                    self.mappa.blit(image_for_door, (x, y))
+                elif tile == map_generator.kUpWall:
+                    self.mappa.blit(random.choice(list_with_up_walls), (x, y))
+                elif tile == map_generator.kDownWall:
+                    self.mappa.blit(random.choice(list_with_down_walls), (x, y))
+                elif tile == map_generator.kRightWall:
+                    self.mappa.blit(random.choice(list_with_right_walls), (x, y))
+                elif tile == map_generator.kLeftWall:
+                    self.mappa.blit(random.choice(list_with_left_walls), (x, y))
+                elif tile == map_generator.kLeftDownInCorner:
+                    self.mappa.blit(image_for_left_down_in_corner, (x, y))
+                elif tile == map_generator.kLeftDownOutCorner:
+                    self.mappa.blit(image_for_left_down_out_corner, (x, y))
+                elif tile == map_generator.kRightDownInCorner:
+                    self.mappa.blit(image_for_right_down_in_corner, (x, y))
+                elif tile == map_generator.kRightDownOutCorner:
+                    self.mappa.blit(image_for_right_down_out_corner, (x, y))
                 else:
-                    pygame.draw.rect(self.mappa, (0, 0, 0), ((x, y), (kSizeOfTile, kSizeOfTile)))
+                    self.mappa.blit(image_for_empty, (x, y))
                 y += kSizeOfTile
             x += kSizeOfTile
             y = 0

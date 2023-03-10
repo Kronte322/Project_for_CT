@@ -10,6 +10,8 @@ kMaxNumOfRoomsInSemiBasic = 2
 
 kMinWidthOfBasicRoom = 5
 kMaxWidthOfBasicRoom = 10
+# kMinWidthOfBasicRoom = 2
+# kMaxWidthOfBasicRoom = 3
 
 kNumOfRoomsOnMap = 10000000
 kNumOfAdditionalRooms = 50
@@ -21,7 +23,18 @@ kDoor = 'D'
 kSign = 'S'
 kFloor = '-'
 kPath = 'P'
-kWall = 'X'
+kUpWall = 'UX'
+kDownWall = 'DX'
+kLeftWall = 'LX'
+kRightWall = 'RX'
+kLeftDownInCorner = 'LDIC'
+kLeftDownOutCorner = 'LDOC'
+kRightDownInCorner = 'RDIC'
+kRightDownOutCorner = 'RDOC'
+
+kWalls = [kUpWall, kDownWall, kLeftWall, kRightWall, kDoor, kLeftDownInCorner, kLeftDownOutCorner, kRightDownOutCorner,
+          kRightDownInCorner]
+
 kEmpty = 'E'
 kOneWidthPath = 'O'
 kBoardOfMap = 'B'
@@ -46,17 +59,17 @@ class MapGenerator:
         return self.main_matrix
 
     def IsItWallForDoor(self, position: tuple):
-        if self.GetTile(position) in [kWall]:
-            if self.GetTile((position[0], position[1] + 1)) in [kWall, kDoor] and self.GetTile(
-                    (position[0], position[1] - 1)) in [kWall, kDoor]:
+        if self.GetTile(position) in [kUpWall]:
+            if self.GetTile((position[0], position[1] + 1)) in [kUpWall, kDoor] and self.GetTile(
+                    (position[0], position[1] - 1)) in [kUpWall, kDoor]:
                 if self.GetTile((position[0] - 1, position[1])) in [kEmpty] and self.GetTile(
                         (position[0] + 1, position[1])) in [kFloor]:
                     return True
                 if self.GetTile((position[0] - 1, position[1])) in [kFloor] and self.GetTile(
                         (position[0] + 1, position[1])) in [kEmpty]:
                     return True
-            if self.GetTile((position[0] + 1, position[1])) in [kWall, kDoor] and self.GetTile(
-                    (position[0] - 1, position[1])) in [kWall, kDoor]:
+            if self.GetTile((position[0] + 1, position[1])) in [kUpWall, kDoor] and self.GetTile(
+                    (position[0] - 1, position[1])) in [kUpWall, kDoor]:
                 if self.GetTile((position[0], position[1] - 1)) in [kEmpty] and self.GetTile(
                         (position[0], position[1] + 1)) in [kFloor]:
                     return True
@@ -67,49 +80,49 @@ class MapGenerator:
 
     def IsThereCorner(self, position: tuple):
         if self.IsThereAnyTile(position, [kEmpty]):
-            if self.GetTile(position) in [kWall] and self.GetTile((position[0] - 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]:
+            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
+                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
                 return True
-            if self.GetTile(position) in [kWall] and self.GetTile((position[0] - 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] - 1)) in [kWall]:
+            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
+                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
                 return True
-            if self.GetTile(position) in [kWall] and self.GetTile((position[0] + 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]:
+            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] + 1, position[1])) in [
+                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
                 return True
-            if self.GetTile(position) in [kWall] and self.GetTile((position[0] + 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] - 1)) in [kWall]:
+            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] + 1, position[1])) in [
+                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
                 return True
         return False
 
     def IsThereCutCorner(self, position: tuple):
         if self.IsThereAnyTile(position, [kEmpty]):
             if self.GetTile(position) in [kFloor] and self.GetTile((position[0] - 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
                 return True
             if self.GetTile(position) in [kFloor] and self.GetTile((position[0] - 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] - 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
                 return True
             if self.GetTile(position) in [kFloor] and self.GetTile((position[0] + 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
                 return True
             if self.GetTile(position) in [kFloor] and self.GetTile((position[0] + 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] - 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
                 return True
         return False
 
     def IsThereCutCornerAfterCreate(self, position: tuple):
         if self.IsThereAnyTile(position, [kFloor]):
             if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] - 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
                 return True
             if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] - 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] - 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
                 return True
             if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] + 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
                 return True
             if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] + 1, position[1])) in [
-                kWall] and self.GetTile((position[0], position[1] - 1)) in [kWall]:
+                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
                 return True
         return False
 
@@ -346,7 +359,7 @@ class MapGenerator:
                         for j in range(-1, height_of_basic_room + 1):
                             if i == -1 or i == width_of_basic_room or j == -1 or j == height_of_basic_room:
                                 self.main_matrix[left_corner_position[0] +
-                                                 i][left_corner_position[1] + j] = kWall
+                                                 i][left_corner_position[1] + j] = kUpWall
                             else:
                                 self.main_matrix[left_corner_position[0] +
                                                  i][left_corner_position[1] + j] = kFloor
@@ -406,9 +419,9 @@ class MapGenerator:
                         if self.main_matrix[left_corner_position[0] +
                                             i][left_corner_position[1] + j] == kEmpty:
                             self.main_matrix[left_corner_position[0] +
-                                             i][left_corner_position[1] + j] = kWall
+                                             i][left_corner_position[1] + j] = kUpWall
                         elif self.main_matrix[left_corner_position[0] +
-                                              i][left_corner_position[1] + j] == kWall and not self.IsInCrossAnyTile(
+                                              i][left_corner_position[1] + j] == kUpWall and not self.IsInCrossAnyTile(
                             (left_corner_position[0] +
                              i, left_corner_position[1] + j), [kEmpty, kBoardOfMap]):
                             self.main_matrix[left_corner_position[0] +
@@ -420,19 +433,19 @@ class MapGenerator:
     def IsThereAllFloors(self, position):
         counter = 0
         if position[0] > 0:
-            if self.main_matrix[position[0] - 1][position[1]] in [kFloor, kWall]:
+            if self.main_matrix[position[0] - 1][position[1]] in [kFloor, kUpWall]:
                 counter += 1
 
         if position[0] < len(self.main_matrix[0]) - 1:
-            if self.main_matrix[position[0] + 1][position[1]] in [kFloor, kWall]:
+            if self.main_matrix[position[0] + 1][position[1]] in [kFloor, kUpWall]:
                 counter += 1
 
         if position[1] > 0:
-            if self.main_matrix[position[0]][position[1] - 1] in [kFloor, kWall]:
+            if self.main_matrix[position[0]][position[1] - 1] in [kFloor, kUpWall]:
                 counter += 1
 
         if position[1] < len(self.main_matrix) - 1:
-            if self.main_matrix[position[0]][position[1] + 1] in [kFloor, kWall]:
+            if self.main_matrix[position[0]][position[1] + 1] in [kFloor, kUpWall]:
                 counter += 1
 
         if counter > 2:
@@ -442,14 +455,14 @@ class MapGenerator:
     def DeleteWallsOnDiagonal(self):
         for i in range(len(self.main_matrix) - 1):
             for j in range(len(self.main_matrix[0]) - 1):
-                if self.main_matrix[i][j] == kWall and self.main_matrix[i + 1][j] == kFloor and self.main_matrix[i][
-                    j + 1] == kFloor and self.main_matrix[i + 1][j + 1] == kWall:
-                    self.main_matrix[i + 1][j] = kWall
-                    self.main_matrix[i][j + 1] = kWall
-                elif self.main_matrix[i][j] == kFloor and self.main_matrix[i + 1][j] == kWall and self.main_matrix[i][
-                    j + 1] == kWall and self.main_matrix[i + 1][j + 1] == kFloor:
-                    self.main_matrix[i][j] = kWall
-                    self.main_matrix[i + 1][j + 1] = kWall
+                if self.main_matrix[i][j] == kUpWall and self.main_matrix[i + 1][j] == kFloor and self.main_matrix[i][
+                    j + 1] == kFloor and self.main_matrix[i + 1][j + 1] == kUpWall:
+                    self.main_matrix[i + 1][j] = kUpWall
+                    self.main_matrix[i][j + 1] = kUpWall
+                elif self.main_matrix[i][j] == kFloor and self.main_matrix[i + 1][j] == kUpWall and self.main_matrix[i][
+                    j + 1] == kUpWall and self.main_matrix[i + 1][j + 1] == kFloor:
+                    self.main_matrix[i][j] = kUpWall
+                    self.main_matrix[i + 1][j + 1] = kUpWall
 
     def OneWidthPaths(self):
         self.OneWidthPathsHorizontal()
@@ -458,15 +471,16 @@ class MapGenerator:
     def OneWidthPathsVertical(self):
         for i in range(len(self.main_matrix)):
             for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i][j - 1] == kWall and self.main_matrix[i][
-                    j + 1] == kWall:
+                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i][j - 1] == kUpWall and self.main_matrix[i][
+                    j + 1] == kUpWall:
                     self.main_matrix[i][j] = kOneWidthPath
 
     def OneWidthPathsHorizontal(self):
         for i in range(1, len(self.main_matrix) - 1):
             for j in range(len(self.main_matrix[0])):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i - 1][j] == kWall and self.main_matrix[i + 1][
-                    j] == kWall:
+                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i - 1][j] == kUpWall and \
+                        self.main_matrix[i + 1][
+                            j] == kUpWall:
                     self.main_matrix[i][j] = kOneWidthPath
 
     def TwoWidthPaths(self):
@@ -476,35 +490,36 @@ class MapGenerator:
     def TwoWidthPathsVertical(self):
         for i in range(len(self.main_matrix)):
             for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i][j - 1] == kWall and self.main_matrix[i][
-                    j + 1] == kEmpty and self.main_matrix[i][j + 2] == kWall:
+                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i][j - 1] == kUpWall and self.main_matrix[i][
+                    j + 1] == kEmpty and self.main_matrix[i][j + 2] == kUpWall:
                     self.main_matrix[i][j] = kOneWidthPath
                     self.main_matrix[i][j + 1] = kOneWidthPath
 
     def TwoWidthPathsHorizontal(self):
         for i in range(1, len(self.main_matrix) - 2):
             for j in range(len(self.main_matrix[0])):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i - 1][j] == kWall and self.main_matrix[i + 1][
-                    j] == kEmpty and self.main_matrix[i + 2][j] == kWall:
+                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i - 1][j] == kUpWall and \
+                        self.main_matrix[i + 1][
+                            j] == kEmpty and self.main_matrix[i + 2][j] == kUpWall:
                     self.main_matrix[i][j] = kOneWidthPath
                     self.main_matrix[i + 1][j] = kOneWidthPath
 
     def DeleteWallsInsideRooms(self):
         for i in range(len(self.main_matrix)):
             for j in range(len(self.main_matrix[0])):
-                if self.main_matrix[i][j] == kWall:
+                if self.main_matrix[i][j] == kUpWall:
                     if self.IsThereAllFloors((i, j)) and not self.IsInCrossAnyTile((i, j), [kEmpty, kBoardOfMap]):
                         self.main_matrix[i][j] = kFloor
 
     def IsThereDoorBetweenRooms(self, position: tuple):
         if (self.GetTile(position) in [kEmpty] and self.GetTile((position[0] - 1, position[1])) in [
-            kWall] and self.GetTile((position[0] + 1, position[1])) in [kWall]) or (
+            kUpWall] and self.GetTile((position[0] + 1, position[1])) in [kUpWall]) or (
                 self.GetTile(position) in [kEmpty] and self.GetTile((position[0], position[1] - 1)) in [
-            kWall] and self.GetTile((position[0], position[1] + 1)) in [kWall]):
-            if self.GetTile((position[0] - 1, position[1] + 1)) in [kWall] and self.GetTile(
-                    (position[0] - 1, position[1] - 1)) in [kWall]:
-                if self.GetTile((position[0] + 1, position[1] + 1)) in [kWall] and self.GetTile(
-                        (position[0] + 1, position[1] - 1)) in [kWall]:
+            kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]):
+            if self.GetTile((position[0] - 1, position[1] + 1)) in [kUpWall] and self.GetTile(
+                    (position[0] - 1, position[1] - 1)) in [kUpWall]:
+                if self.GetTile((position[0] + 1, position[1] + 1)) in [kUpWall] and self.GetTile(
+                        (position[0] + 1, position[1] - 1)) in [kUpWall]:
                     return True
         return False
 
@@ -525,6 +540,82 @@ class MapGenerator:
         self.DeleteCutCornersAfterCreate(list_of_corners)
         self.DeleteWrongWall()
         self.DeleteCutCorners()
+        self.ParseWalls()
+        self.ParseCorners()
+
+    def IsItRightWall(self, position):
+        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
+            kFloor] and self.GetTile((position[0] + 1, position[1])) in [kEmpty]
+
+    def IsItLeftWall(self, position):
+        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
+            kEmpty] and self.GetTile((position[0] + 1, position[1])) in [kFloor]
+
+    def IsItDownWall(self, position):
+        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [
+            kFloor] and self.GetTile((position[0], position[1] + 1)) in [kEmpty]
+
+    def IsItUpWall(self, position):
+        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [
+            kEmpty] and self.GetTile((position[0], position[1] + 1)) in [kFloor]
+
+    def ParseWalls(self):
+        for i in range(1, len(self.main_matrix) - 2):
+            for j in range(1, len(self.main_matrix[0]) - 2):
+                if self.IsItRightWall((i, j)):
+                    self.main_matrix[i][j] = kRightWall
+                elif self.IsItDownWall((i, j)):
+                    self.main_matrix[i][j] = kDownWall
+                elif self.IsItUpWall((i, j)):
+                    self.main_matrix[i][j] = kUpWall
+                elif self.IsItLeftWall((i, j)):
+                    self.main_matrix[i][j] = kLeftWall
+
+    def IsItLeftDownOutCorner(self, position):
+        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] - 1)) in kWalls \
+            and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
+                (position[0] + 1, position[1] - 1)) in [kFloor]
+
+    def IsItLeftDownInCorner(self, position):
+        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
+            and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
+                (position[0] - 1, position[1] + 1)) in [kEmpty]
+
+    def IsItRightDownOutCorner(self, position):
+        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] - 1)) in kWalls \
+            and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
+                (position[0] - 1, position[1] - 1)) in [kFloor]
+
+    def IsItRightDownInCorner(self, position):
+        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
+            and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
+                (position[0] + 1, position[1] + 1)) in [kEmpty]
+
+    def IsItLeftUpCorner(self, position):
+        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
+            and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
+                (position[0] + 1, position[1] + 1)) in [kFloor]
+
+    def IsItRightUpCorner(self, position):
+        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
+            and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
+                (position[0] - 1, position[1] + 1)) in [kFloor]
+
+    def ParseCorners(self):
+        for i in range(1, len(self.main_matrix) - 2):
+            for j in range(1, len(self.main_matrix[0]) - 2):
+                if self.IsItLeftDownInCorner((i, j)):
+                    self.main_matrix[i][j] = kLeftDownInCorner
+                elif self.IsItLeftDownOutCorner((i, j)):
+                    self.main_matrix[i][j] = kLeftDownOutCorner
+                elif self.IsItRightDownInCorner((i, j)):
+                    self.main_matrix[i][j] = kRightDownInCorner
+                elif self.IsItRightDownOutCorner((i, j)):
+                    self.main_matrix[i][j] = kRightDownOutCorner
+                elif self.IsItRightUpCorner((i, j)):
+                    self.main_matrix[i][j] = kRightWall
+                elif self.IsItLeftUpCorner((i, j)):
+                    self.main_matrix[i][j] = kLeftWall
 
     def CountEmptyTiles(self, position):
         list = self.GetAround(position)
@@ -536,13 +627,13 @@ class MapGenerator:
         return res
 
     def IsThereWrongWall(self, position):
-        if self.GetTile(position) in [kWall] and self.CountEmptyTiles(position) > 5:
+        if self.GetTile(position) in [kUpWall] and self.CountEmptyTiles(position) > 5:
             return True
         return False
 
     def DeleteWrongWall(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
+        for i in range(1, len(self.main_matrix) - 2):
+            for j in range(1, len(self.main_matrix[0]) - 2):
                 if self.IsThereWrongWall((i, j)):
                     self.main_matrix[i][j] = kEmpty
         # self.SetDoorWaysOnMap()
@@ -568,7 +659,7 @@ class MapGenerator:
                 if self.GetTile((i, j)) in [kDoor]:
                     interm = self.IsThereFakeDoor((i, j))
                     if interm != False:
-                        self.main_matrix[i][j] = kWall
+                        self.main_matrix[i][j] = kUpWall
                         self.main_matrix[interm[0]][interm[1]] = kEmpty
 
     def SetBoardsOfMap(self):
@@ -585,11 +676,11 @@ class MapGenerator:
         for i in range(1, len(self.main_matrix) - 1):
             for j in range(1, len(self.main_matrix[0]) - 1):
                 if self.IsThereCutCorner((i, j)):
-                    self.main_matrix[i][j] = kWall
+                    self.main_matrix[i][j] = kUpWall
 
     def DeleteCutCornersAfterCreate(self, list_of_corners):
         for i in list_of_corners:
-            self.main_matrix[i[0]][i[1]] = kWall
+            self.main_matrix[i[0]][i[1]] = kUpWall
 
     def MakeCutCorners(self, list_of_corners):
         for i in range(1, len(self.main_matrix) - 1):
@@ -610,7 +701,7 @@ class MapGenerator:
     def SetDoorWaysOnMap(self):
         for i in range(1, len(self.main_matrix) - 1):
             for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.GetTile((i, j)) in [kWall] and self.IsThereCorner((i, j)):
+                if self.GetTile((i, j)) in [kUpWall] and self.IsThereCorner((i, j)):
                     self.dfs.DFSForCornersOfRoom((i, j))
                     # return
         for k in self.dfs.GetPath():
@@ -625,7 +716,7 @@ class MapGenerator:
                 if self.IsThereDoorBetweenRooms((i, j)):
                     counter += 1
                     if counter % freq_of_door == 0:
-                        if self.GetTile((i + 1, j)) in kWall:
+                        if self.GetTile((i + 1, j)) in kUpWall:
                             self.main_matrix[i - 1][j] = kDoor
                             self.main_matrix[i + 1][j] = kDoor
                         else:
@@ -641,9 +732,9 @@ class MapGenerator:
             for j in range(1, len(self.main_matrix[0]) - 1):
                 if self.dfs.used.get((i, j)) == None:
                     if self.GetTile((i, j)) in [kDoor] and self.GetTile((i - 1, j)) in [kDoor]:
-                        self.main_matrix[i - 1][j] = kWall
+                        self.main_matrix[i - 1][j] = kUpWall
                     if self.GetTile((i, j)) in [kDoor] and self.GetTile((i, j - 1)) in [kDoor]:
-                        self.main_matrix[i][j - 1] = kWall
+                        self.main_matrix[i][j - 1] = kUpWall
 
     def SetFloorInFrontOfDoor(self):
         for i in range(1, len(self.main_matrix) - 1):
