@@ -4,6 +4,7 @@ import time
 random.seed(time.time())
 
 kNumOfBasicRooms = 50
+kNumOfColumns = 35
 kNumOfSemiBasicRooms = 50
 
 kMaxNumOfRoomsInSemiBasic = 2
@@ -13,12 +14,16 @@ kMaxWidthOfBasicRoom = 10
 # kMinWidthOfBasicRoom = 2
 # kMaxWidthOfBasicRoom = 3
 
+kMinWidthOfColumn = 1
+kMaxWidthOfColumn = 3
+
 kNumOfRoomsOnMap = 10000000
 kNumOfAdditionalRooms = 50
 
 kMinFreqOfDoor = 10
 kMaxFreqOfDoor = 20
 
+kColumn = 'C'
 kDoor = 'D'
 kSign = 'S'
 kFloor = '-'
@@ -44,6 +49,7 @@ class MapGenerator:
     def __init__(self):
         self.main_matrix = []
         self.basic_rooms = []
+        self.columns = []
         self.size = []
 
     def GenerateMap(self, size=(30, 20)):
@@ -53,6 +59,7 @@ class MapGenerator:
         self.FillMatrix()
         self.SetBoardsOfMap()
         self.GenerateBasicRooms()
+        self.GenerateColumns()
         self.GenerateMapWithRooms()
         self.AdditiobalGeneration()
         self.PostProcessing()
@@ -295,13 +302,28 @@ class MapGenerator:
                 interm.append(interm_array)
             self.basic_rooms.append(interm)
 
-    def GetSizeOfBasicRoom(self, basic_room):
+    def GenerateColumns(self):
+        for i in range(kNumOfColumns):
+            interm = []
+            x_coord = random.randrange(
+                kMinWidthOfColumn, kMaxWidthOfColumn)
+            y_coord = random.randrange(
+                kMinWidthOfColumn, kMaxWidthOfColumn)
+            right_down_corner = (x_coord, y_coord)
+            for i in range(right_down_corner[0]):
+                interm_array = []
+                for j in range(right_down_corner[1]):
+                    interm_array.append(kEmpty)
+                interm.append(interm_array)
+            self.columns.append(interm)
+
+    def GetSizeRoom(self, basic_room):
         width = len(basic_room)
         height = len(basic_room[0])
         return (width, height)
 
-    def IsThereIntersec(self, room, pos_of_room: tuple) -> bool:
-        size_of_room = self.GetSizeOfBasicRoom(room)
+    def IsThereIntersec(self, room, pos_of_room: tuple, list_of_tiles=[kEmpty]) -> bool:
+        size_of_room = self.GetSizeRoom(room)
         bounds_for_loop = []
         if pos_of_room[0] > 1:
             bounds_for_loop.append(-2)
@@ -325,7 +347,7 @@ class MapGenerator:
 
         for i in range(bounds_for_loop[0], bounds_for_loop[1]):
             for j in range(bounds_for_loop[2], bounds_for_loop[3]):
-                if self.main_matrix[pos_of_room[0] + i][pos_of_room[1] + j] != kEmpty:
+                if self.main_matrix[pos_of_room[0] + i][pos_of_room[1] + j] not in list_of_tiles:
                     return True
         return False
 
@@ -340,8 +362,8 @@ class MapGenerator:
 
             num_of_basic_room = random.randrange(0, kNumOfBasicRooms)
             basic_room = self.basic_rooms[num_of_basic_room]
-            width_of_basic_room = self.GetSizeOfBasicRoom(basic_room)[0]
-            height_of_basic_room = self.GetSizeOfBasicRoom(basic_room)[1]
+            width_of_basic_room = self.GetSizeRoom(basic_room)[0]
+            height_of_basic_room = self.GetSizeRoom(basic_room)[1]
             x_coord = random.randrange(2, self.size[0] - width_of_basic_room - 1)
             y_coord = random.randrange(2, self.size[1] - height_of_basic_room - 1)
             left_corner_position = (x_coord, y_coord)
@@ -363,6 +385,44 @@ class MapGenerator:
                             else:
                                 self.main_matrix[left_corner_position[0] +
                                                  i][left_corner_position[1] + j] = kFloor
+
+    def GenerateMapWithColumns(self):
+        num_of_generated_rooms = 0
+        num_of_generations = 0
+        while num_of_generated_rooms != kNumOfColumns:
+            if num_of_generations == 1000:
+                break
+            num_of_generations += 1
+
+            num_of_column = random.randrange(0, kNumOfColumns)
+            column = self.columns[num_of_column]
+            width_of_column = self.GetSizeRoom(column)[0] + 1
+            height_of_column = self.GetSizeRoom(column)[1] + 1
+            x_coord = random.randrange(2, self.size[0] - width_of_column - 2)
+            y_coord = random.randrange(2, self.size[1] - height_of_column - 2)
+            left_corner_position = (x_coord - 1, y_coord - 1)
+            sign = False
+            counter = 0
+            while sign != True:
+                if counter == 50:
+                    break
+
+                counter += 1
+                if not self.IsThereIntersec(column, left_corner_position, list_of_tiles=[kFloor]):
+                    width_of_column -= 1
+                    height_of_column -= 1
+                    x_coord += 1
+                    y_coord += 1
+                    sign = True
+                    num_of_generated_rooms += 1
+                    for i in range(-1, width_of_column + 1):
+                        for j in range(-1, height_of_column + 1):
+                            if i == -1 or i == width_of_column or j == -1 or j == height_of_column:
+                                self.main_matrix[left_corner_position[0] +
+                                                 i][left_corner_position[1] + j] = kUpWall
+                            else:
+                                self.main_matrix[left_corner_position[0] +
+                                                 i][left_corner_position[1] + j] = kColumn
 
     def IsInCrossAnyTile(self, position, tiles) -> bool:
         if position[0] > 0:
@@ -407,8 +467,8 @@ class MapGenerator:
             num_of_generated += 1
             num_of_basic_room = random.randrange(0, kNumOfBasicRooms)
             basic_room = self.basic_rooms[num_of_basic_room]
-            width_of_basic_room = self.GetSizeOfBasicRoom(basic_room)[0]
-            height_of_basic_room = self.GetSizeOfBasicRoom(basic_room)[1]
+            width_of_basic_room = self.GetSizeRoom(basic_room)[0]
+            height_of_basic_room = self.GetSizeRoom(basic_room)[1]
             x_coord = random.randrange(2, self.size[0] - width_of_basic_room - 1)
             y_coord = random.randrange(2, self.size[1] - height_of_basic_room - 1)
             left_corner_position = (x_coord, y_coord)
@@ -526,6 +586,7 @@ class MapGenerator:
     def PostProcessing(self):
         self.DeleteWallsInsideRooms()
         self.DeleteWallsOnDiagonal()
+        self.GenerateMapWithColumns()
         self.dfs = DFSAlgo(self)
         self.SetPathsOnMap()
         self.DeleteCutCorners()
@@ -545,19 +606,23 @@ class MapGenerator:
 
     def IsItRightWall(self, position):
         return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
-            kFloor] and self.GetTile((position[0] + 1, position[1])) in [kEmpty]
+            kFloor] and self.GetTile((position[0] + 1, position[1])) in [kEmpty, kColumn]
 
     def IsItLeftWall(self, position):
-        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
-            kEmpty] and self.GetTile((position[0] + 1, position[1])) in [kFloor]
+        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [kEmpty,
+                                                                                                        kColumn] and \
+            self.GetTile(
+                (position[0] + 1, position[1])) in [kFloor]
 
     def IsItDownWall(self, position):
         return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [
-            kFloor] and self.GetTile((position[0], position[1] + 1)) in [kEmpty]
+            kFloor] and self.GetTile((position[0], position[1] + 1)) in [kEmpty, kColumn]
 
     def IsItUpWall(self, position):
-        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [
-            kEmpty] and self.GetTile((position[0], position[1] + 1)) in [kFloor]
+        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kEmpty,
+                                                                                                        kColumn] and \
+            self.GetTile(
+                (position[0], position[1] + 1)) in [kFloor]
 
     def ParseWalls(self):
         for i in range(1, len(self.main_matrix) - 2):
@@ -579,7 +644,7 @@ class MapGenerator:
     def IsItLeftDownInCorner(self, position):
         return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
             and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
-                (position[0] - 1, position[1] + 1)) in [kEmpty]
+                (position[0] - 1, position[1] + 1)) in [kEmpty, kColumn]
 
     def IsItRightDownOutCorner(self, position):
         return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] - 1)) in kWalls \
@@ -589,7 +654,7 @@ class MapGenerator:
     def IsItRightDownInCorner(self, position):
         return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
             and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
-                (position[0] + 1, position[1] + 1)) in [kEmpty]
+                (position[0] + 1, position[1] + 1)) in [kEmpty, kColumn]
 
     def IsItLeftUpCorner(self, position):
         return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \

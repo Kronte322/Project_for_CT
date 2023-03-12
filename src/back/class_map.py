@@ -5,7 +5,7 @@ from src.back import map_generator
 
 random.seed(time.time())
 
-kSizeOfTile = 48
+kSizeOfTile = 72
 kSizeOfMap = (128, 128)
 
 kNumOfUpWalls = 3

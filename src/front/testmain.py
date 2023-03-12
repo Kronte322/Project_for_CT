@@ -1,6 +1,7 @@
 import sys
 from src.back import class_map
 import pygame
+import math
 
 sys.setrecursionlimit(10000000)
 mappa = class_map.Map()
@@ -14,19 +15,24 @@ clock = pygame.time.Clock()
 
 kSizeOfMoveBox = [600, 300]
 
+kSizeOfCharacter = 48
+kFramesPerSec = 60
+
 
 class Player:
     def __init__(self):
-        self.kSpeed = 6
-        self.image = pygame.Surface((32, 32), flags=pygame.SRCALPHA)
+        self.kSpeed = 7
+        # self.kSpeed = 1.3
+
+        self.image = pygame.Surface((kSizeOfCharacter, kSizeOfCharacter), flags=pygame.SRCALPHA)
         self.image.fill((0, 0, 0, 0))
         self.image_of_character = pygame.image.load(
             "../tile_sets/tiles_for_chars/sprite_10.png")
         self.image_of_character = pygame.transform.scale(
-            self.image_of_character, (32, 32))
+            self.image_of_character, (kSizeOfCharacter, kSizeOfCharacter))
         self.image.blit(self.image_of_character, (0, 0))
         self.rect = pygame.Rect(
-            (kSizeOfDisplay[0] // 2, kSizeOfDisplay[1] // 2), (32, 32))
+            (kSizeOfDisplay[0] // 2, kSizeOfDisplay[1] // 2), (kSizeOfCharacter, kSizeOfCharacter))
         self.map_pos = (0, 0)
         self.moveBox = (kSizeOfDisplay[0] // 2 - kSizeOfMoveBox[0] // 2, kSizeOfDisplay[1] // 2 - kSizeOfMoveBox[1] //
                         2, kSizeOfDisplay[0] // 2 + kSizeOfMoveBox[0] // 2,
@@ -46,13 +52,13 @@ class Player:
         if player.rect.x <= self.moveBox[0]:
             self.rect.x += self.kSpeed
             mx += self.kSpeed
-        elif player.rect.x >= self.moveBox[2] - 32:
+        elif player.rect.x >= self.moveBox[2] - 48:
             self.rect.x -= self.kSpeed
             mx -= self.kSpeed
         if player.rect.y <= self.moveBox[1]:
             self.rect.y += self.kSpeed
             my += self.kSpeed
-        elif player.rect.y >= self.moveBox[3] - 32:
+        elif player.rect.y >= self.moveBox[3] - 48:
             self.rect.y -= self.kSpeed
             my -= self.kSpeed
         self.map_pos = (mx, my)
@@ -65,14 +71,15 @@ player = Player()
 
 RUNNING = True
 while RUNNING:
-    clock.tick(60)
+    clock.tick(kFramesPerSec)
+    # clock.tick()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             RUNNING = False
 
     player.move()
 
-    display.fill((0, 155, 0))
+    display.fill((0, 0, 0))
     mappa.Render(display, player.map_pos)
     player.render(display)
 
