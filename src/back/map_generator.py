@@ -19,6 +19,7 @@ kMaxWidthOfColumn = 3
 
 kNumOfRoomsOnMap = 10000000
 kNumOfAdditionalRooms = 50
+# kNumOfAdditionalRooms = 5
 
 kMinFreqOfDoor = 10
 kMaxFreqOfDoor = 20

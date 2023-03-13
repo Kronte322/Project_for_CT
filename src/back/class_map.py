@@ -1,9 +1,13 @@
 import pygame
 import random
 import time
+import sys
 from src.back import map_generator
+# from src.front.testmain import kSpawnPosition
+kSpawnPosition = [1920 // 2, 1000 // 2]
 
 random.seed(time.time())
+# random.seed(12)
 
 kSizeOfTile = 72
 kSizeOfMap = (128, 128)
@@ -70,7 +74,6 @@ def SetTiles():
         list_with_floor.append(SetImage("../tile_sets/tiles_for_map/floor/sprite_", i))
 
 
-
 class Map:
     def __init__(self):
         SetTiles()
@@ -107,11 +110,18 @@ class Map:
             y = 0
 
     def GetTile(self, position):
-        return self.matrix_with_map[position[0] // 48][position[1] // 48]
+        return self.matrix_with_map[position[0] // kSizeOfTile][position[1] // kSizeOfTile]
 
     def CanStandThere(self, position):
         tile = self.GetTile(position)
-        return tile in [map_generator.kFloor]
+        return tile in [map_generator.kFloor, map_generator.kDoor, map_generator.kPath]
 
     def Render(self, display, position):
         display.blit(self.mappa, position)
+
+    def SpawnPosition(self):
+        while True:
+            x = random.randrange(1, kSizeOfMap[0])
+            y = random.randrange(1, kSizeOfMap[1])
+            if self.matrix_with_map[x][y] in [map_generator.kFloor]:
+                return -x * kSizeOfTile + kSpawnPosition[0], -y * kSizeOfTile + kSpawnPosition[1]
