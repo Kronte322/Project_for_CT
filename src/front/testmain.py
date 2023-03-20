@@ -26,6 +26,8 @@ image_for_zoo = pygame.image.load("../tile_sets/tiles_for_map/back_ground/sprite
 image_for_zoo = pygame.transform.scale(image_for_zoo, (kSizeOfDisplay[0], kSizeOfDisplay[1]))
 image_for_zoom.blit(image_for_zoo, (0, 0))
 
+mappa.SpawnPosition()
+
 
 class Player:
     def __init__(self):
@@ -43,50 +45,48 @@ class Player:
         self.rect = pygame.Rect((kSpawnPosition[0], kSpawnPosition[1]), (kSizeOfCharacter, kSizeOfCharacter))
         # self.rect = pygame.Rect(
         #     (0, 0), (kSizeOfCharacter, kSizeOfCharacter))
-        self.map_pos = mappa.SpawnPosition()
+
         self.moveBox = (kSizeOfDisplay[0] // 2 - kSizeOfMoveBox[0] // 2, kSizeOfDisplay[1] // 2 - kSizeOfMoveBox[1] //
                         2, kSizeOfDisplay[0] // 2 + kSizeOfMoveBox[0] // 2,
                         kSizeOfDisplay[1] // 2 + kSizeOfMoveBox[1] // 2)
 
     def move(self):
-        mx, my = self.map_pos
         key = pygame.key.get_pressed()
         if key[pygame.K_w]:
             if mappa.CanStandThere(
                     (
-                            self.rect.x - self.map_pos[0],
-                            self.rect.y - self.map_pos[1] + kSizeOfCharacter - self.kSpeed - 8)):
-                if mappa.CanStandThere((self.rect.x - self.map_pos[0] + kSizeOfCharacter,
-                                        self.rect.y - self.map_pos[1] + kSizeOfCharacter - self.kSpeed - 8)):
+                            self.rect.x,
+                            self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
+                if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
+                                        self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
                     self.rect.y -= self.kSpeed
         if key[pygame.K_a]:
             if mappa.CanStandThere(
-                    (self.rect.x - self.map_pos[0] - self.kSpeed, self.rect.y - self.map_pos[1] + kSizeOfCharacter)):
+                    (self.rect.x - self.kSpeed, self.rect.y + kSizeOfCharacter)):
                 self.rect.x -= self.kSpeed
         if key[pygame.K_s]:
             if mappa.CanStandThere(
-                    (self.rect.x - self.map_pos[0], self.rect.y - self.map_pos[1] + kSizeOfCharacter + self.kSpeed)):
-                if mappa.CanStandThere((self.rect.x - self.map_pos[0] + kSizeOfCharacter,
-                                        self.rect.y - self.map_pos[1] + kSizeOfCharacter + self.kSpeed)):
+                    (self.rect.x, self.rect.y + kSizeOfCharacter + self.kSpeed)):
+                if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
+                                        self.rect.y + kSizeOfCharacter + self.kSpeed)):
                     self.rect.y += self.kSpeed
         if key[pygame.K_d]:
             if mappa.CanStandThere(
-                    (self.rect.x - self.map_pos[0] + kSizeOfCharacter + self.kSpeed,
-                     self.rect.y - self.map_pos[1] + kSizeOfCharacter)):
+                    (self.rect.x + kSizeOfCharacter + self.kSpeed,
+                     self.rect.y + kSizeOfCharacter)):
                 self.rect.x += self.kSpeed
         if player.rect.x <= self.moveBox[0]:
             self.rect.x += self.kSpeed
-            mx += self.kSpeed
+            mappa.MoveMap([self.kSpeed, 0])
         elif player.rect.x >= self.moveBox[2] - 48:
             self.rect.x -= self.kSpeed
-            mx -= self.kSpeed
+            mappa.MoveMap([-self.kSpeed, 0])
         if player.rect.y <= self.moveBox[1]:
             self.rect.y += self.kSpeed
-            my += self.kSpeed
+            mappa.MoveMap([0, self.kSpeed])
         elif player.rect.y >= self.moveBox[3] - 48:
             self.rect.y -= self.kSpeed
-            my -= self.kSpeed
-        self.map_pos = (mx, my)
+            mappa.MoveMap([0, -self.kSpeed])
 
     def render(self, display):
         display.blit(self.image, (self.rect.x, self.rect.y))
@@ -105,12 +105,14 @@ while RUNNING:
     player.move()
 
     display.fill((37, 19, 26))
-    mappa.Render(display, player.map_pos)
-    if mappa.GetTile(
-            (player.rect.x - player.map_pos[0] + kSizeOfCharacter // 2,
-             player.rect.y - player.map_pos[1] + kSizeOfCharacter)) in [
-        map_generator.kPath]:
-        display.blit(image_for_zoom, (0, 0))
+
+    mappa.SetCurrentRoom([player.rect.x + kSizeOfCharacter // 2, player.rect.y + kSizeOfCharacter])
+    mappa.Render(display)
+
+    # if mappa.GetTile(
+    #         (player.rect.x - player.map_pos[0] + kSizeOfCharacter // 2,
+    #          player.rect.y - player.map_pos[1] + kSizeOfCharacter)) in [map_generator.kPath]:
+    #     display.blit(image_for_zoom, (0, 0))
     player.render(display)
 
     pygame.display.flip()
