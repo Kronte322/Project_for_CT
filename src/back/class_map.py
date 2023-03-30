@@ -10,7 +10,7 @@ kSpawnPosition = [1920 // 2, 1000 // 2]
 random.seed(time.time())
 # random.seed(12)
 
-kSizeOfTile = 72
+kSizeOfTile = 12
 kSizeOfMap = (128, 128)
 # kSizeOfMap = (20, 20)
 kNumOfUpWalls = 3
@@ -55,6 +55,8 @@ image_for_right_down_out_corner = pygame.image.load(
 image_for_right_down_out_corner = pygame.transform.scale(
     image_for_right_down_out_corner, (kSizeOfTile, kSizeOfTile))
 
+genered_floor = {}
+
 
 def SetImage(path, number, size=kSizeOfTile):
     result = pygame.image.load(path + str(number) + ".png")
@@ -89,7 +91,7 @@ class Map:
         self.saved_rooms = {}
         self.global_map_position = [0, 0]
         self.current_room_position = [0, 0]
-        self.Blit(self.mappa, self.matrix_with_map)
+        self.Blit(self.mappa, self.matrix_with_map, (0, 0))
 
     def BlitMap(self, list_with_map):
         left_upper_corner = (
@@ -111,33 +113,37 @@ class Map:
 
         for i in list_with_map:
             matrix_with_map[i[0][0] - left_upper_corner[0]][i[0][1] - left_upper_corner[1]] = i[1]
-        self.Blit(self.current_room, matrix_with_map)
+        self.Blit(self.current_room, matrix_with_map, left_upper_corner)
         return left_upper_corner
 
     @staticmethod
-    def Blit(surface, matrix):
+    def Blit(surface, matrix, left_corner):
         x, y = 0, 0
         for i in range(len(matrix)):
-            for tile in matrix[i]:
-                if tile in [map_generator.kFloor, map_generator.kPath]:
-                    surface.blit(random.choice(list_with_floor), (x, y))
-                elif tile == map_generator.kDoor:
+            for j in range(len(matrix[i])):
+                if matrix[i][j] in [map_generator.kFloor, map_generator.kPath]:
+                    if (i + left_corner[0], j + left_corner[1]) in genered_floor:
+                        surface.blit(genered_floor[(i + left_corner[0], j + left_corner[1])], (x, y))
+                    else:
+                        genered_floor[(i + left_corner[0], j + left_corner[1])] = random.choice(list_with_floor)
+                        surface.blit(genered_floor[(i + left_corner[0], j + left_corner[1])], (x, y))
+                elif matrix[i][j] == map_generator.kDoor:
                     surface.blit(image_for_door, (x, y))
-                elif tile == map_generator.kUpWall:
+                elif matrix[i][j] == map_generator.kUpWall:
                     surface.blit(random.choice(list_with_up_walls), (x, y))
-                elif tile == map_generator.kDownWall:
+                elif matrix[i][j] == map_generator.kDownWall:
                     surface.blit(random.choice(list_with_down_walls), (x, y))
-                elif tile == map_generator.kRightWall:
+                elif matrix[i][j] == map_generator.kRightWall:
                     surface.blit(random.choice(list_with_right_walls), (x, y))
-                elif tile == map_generator.kLeftWall:
+                elif matrix[i][j] == map_generator.kLeftWall:
                     surface.blit(random.choice(list_with_left_walls), (x, y))
-                elif tile == map_generator.kLeftDownInCorner:
+                elif matrix[i][j] == map_generator.kLeftDownInCorner:
                     surface.blit(image_for_left_down_in_corner, (x, y))
-                elif tile == map_generator.kLeftDownOutCorner:
+                elif matrix[i][j] == map_generator.kLeftDownOutCorner:
                     surface.blit(image_for_left_down_out_corner, (x, y))
-                elif tile == map_generator.kRightDownInCorner:
+                elif matrix[i][j] == map_generator.kRightDownInCorner:
                     surface.blit(image_for_right_down_in_corner, (x, y))
-                elif tile == map_generator.kRightDownOutCorner:
+                elif matrix[i][j] == map_generator.kRightDownOutCorner:
                     surface.blit(image_for_right_down_out_corner, (x, y))
                 else:
                     surface.blit(image_for_empty, (x, y))
@@ -160,19 +166,20 @@ class Map:
         if not flag:
             player_position = [player_position[0] - self.global_map_position[0],
                                player_position[1] - self.global_map_position[1]]
+
         if (self.GetPositionOfTile(player_position), self.GetTile(player_position)) not in list(
                 self.tiles_for_current_room.keys()):
             if self.GetPositionOfTile(player_position) not in list(self.saved_rooms.keys()):
-                self.tiles_for_current_room = {}
                 current_room = []
+                self.tiles_for_current_room = {}
                 keys = []
-                if self.map_generator.GetTile(self.GetPositionOfTile(player_position)) in [map_generator.kPath,
-                                                                                           map_generator.kDoor]:
+                if self.GetTile(player_position) in [map_generator.kPath]:
                     self.dfs.DFSOnTheSpecificTiles(self.GetPositionOfTile(player_position), current_room,
-                                                   [map_generator.kPath, map_generator.kDoor], keys=keys, flag='path')
-                    for i in current_room:
-                        self.tiles_for_current_room[i] = True
-                elif self.map_generator.GetTile(self.GetPositionOfTile(player_position)) in [map_generator.kFloor]:
+                                                   [map_generator.kPath, map_generator.kDoor], depth=10)
+                    self.tiles_for_current_room[
+                        (self.GetPositionOfTile(player_position), self.GetTile(player_position))] = True
+                elif self.map_generator.GetTile(self.GetPositionOfTile(player_position)) in [map_generator.kFloor,
+                                                                                             map_generator.kDoor]:
                     self.dfs.DFSOnTheSpecificTiles(self.GetPositionOfTile(player_position), current_room,
                                                    map_generator.kWalls + [map_generator.kDoor, map_generator.kFloor],
                                                    keys=keys, flag='room')
@@ -200,7 +207,8 @@ class Map:
                         1] * kSizeOfTile]
 
     def Render(self, display):
-        display.blit(self.current_room, self.current_room_position)
+        display.blit(self.mappa, self.global_map_position)
+        # display.blit(self.current_room, self.current_room_position)
 
     def MoveMap(self, position):
         self.global_map_position[0] += position[0]

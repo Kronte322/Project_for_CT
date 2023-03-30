@@ -5,25 +5,25 @@ random.seed(time.time())
 # random.seed(12)
 
 kNumOfBasicRooms = 50
-kNumOfColumns = 10000
-# kNumOfColumns = 35
+# kNumOfColumns = 0
+kNumOfColumns = 35
 kNumOfSemiBasicRooms = 50
 
 kMaxNumOfRoomsInSemiBasic = 2
 
 kMinWidthOfBasicRoom = 5
 kMaxWidthOfBasicRoom = 10
-# kMinWidthOfBasicRoom = 2
-# kMaxWidthOfBasicRoom = 3
+# kMinWidthOfBasicRoom = 5
+# kMaxWidthOfBasicRoom = 6
 
 kMinWidthOfColumn = 1
 kMaxWidthOfColumn = 3
 
 kNumOfRoomsOnMap = 10000000
-kNumOfAdditionalRooms = 50
+kNumOfAdditionalRooms = 12
 # kNumOfAdditionalRooms = 0
 kMinFreqOfDoor = 10
-kMaxFreqOfDoor = 20
+kMaxFreqOfDoor = 15
 
 kColumn = 'C'
 kDoor = 'D'
@@ -38,6 +38,7 @@ kLeftDownInCorner = 'LDIC'
 kLeftDownOutCorner = 'LDOC'
 kRightDownInCorner = 'RDIC'
 kRightDownOutCorner = 'RDOC'
+kProbDoor = 'PD'
 
 kWalls = [kUpWall, kDownWall, kLeftWall, kRightWall, kDoor, kLeftDownInCorner, kLeftDownOutCorner, kRightDownOutCorner,
           kRightDownInCorner]
@@ -60,10 +61,10 @@ class MapGenerator:
         self.size = size
         self.FillMatrix()
         self.SetBoardsOfMap()
-        self.GenerateBasicRooms()
         self.GenerateColumns()
+        self.GenerateBasicRooms()
         self.GenerateMapWithRooms()
-        self.AdditiobalGeneration()
+        self.AdditionalGeneration()
         self.PostProcessing()
         return self.main_matrix
 
@@ -467,7 +468,7 @@ class MapGenerator:
             return True
         return False
 
-    def AdditiobalGeneration(self):
+    def AdditionalGeneration(self):
         num_of_generated = 0
         while num_of_generated != kNumOfAdditionalRooms:
             num_of_generated += 1
@@ -592,9 +593,11 @@ class MapGenerator:
     def PostProcessing(self):
         self.DeleteWallsInsideRooms()
         self.DeleteWallsOnDiagonal()
-        self.GenerateMapWithColumns()
+        self.DeleteQuaterWalls()
         self.dfs = DFSAlgo(self)
         self.SetPathsOnMap()
+        self.GenerateMapWithColumns()
+        self.SetDoors()
         self.DeleteCutCorners()
         self.SetDoorsBetweenRooms()
         self.DeleteDoubleDoors()
@@ -610,23 +613,63 @@ class MapGenerator:
         self.ParseWalls()
         self.ParseCorners()
 
+    def DeleteQuaterWalls(self):
+        for i in range(2, len(self.main_matrix) - 3):
+            for j in range(2, len(self.main_matrix[0]) - 3):
+                self.SupportDeleteQuater((i, j))
+
+    def SupportDeleteQuater(self, position):
+        counter_for_walls = 0
+        counter_for_floors = 0
+        counter_for_empty = 0
+        for i in range(3):
+            for j in range(3):
+                if self.main_matrix[position[0] + i][position[1] + j] in [kFloor]:
+                    counter_for_floors += 1
+                elif self.main_matrix[position[0] + i][position[1] + j] in [kUpWall]:
+                    counter_for_walls += 1
+                elif self.main_matrix[position[0] + i][position[1] + j] in [kEmpty]:
+                    counter_for_empty += 1
+        if counter_for_walls >= 5 and counter_for_floors >= 1 and counter_for_empty >= 1:
+            for i in range(3):
+                for j in range(3):
+                    self.main_matrix[position[0] + i][position[1] + j] = kEmpty
+            for i in range(3):
+                for j in range(3):
+                    if self.GetTile((position[0] + i, position[1] + j)) in [kEmpty]:
+                        if self.IsThereAnyTile((position[0] + i, position[1] + j), tiles=[kFloor]):
+                            self.main_matrix[position[0] + i][position[1] + j] = kUpWall
+
+    def SetDoors(self):
+        self.dfs.used.clear()
+        for i in range(1, len(self.main_matrix) - 2):
+            for j in range(1, len(self.main_matrix[0]) - 2):
+                if self.GetTile((i, j)) in [kProbDoor]:
+                    self.dfs.DFSForSetDoors((i, j))
+        for i in range(1, len(self.main_matrix) - 2):
+            for j in range(1, len(self.main_matrix[0]) - 2):
+                if self.GetTile((i, j)) in [kProbDoor]:
+                    self.main_matrix[i][j] = kUpWall
+
     def IsItRightWall(self, position):
         return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
-            kFloor] and self.GetTile((position[0] + 1, position[1])) in [kEmpty, kColumn]
+            kFloor] and self.GetTile((position[0] + 1, position[1])) in [kEmpty, kColumn, kBoardOfMap]
 
     def IsItLeftWall(self, position):
         return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [kEmpty,
-                                                                                                        kColumn] and \
+                                                                                                        kColumn,
+                                                                                                        kBoardOfMap] and \
             self.GetTile(
                 (position[0] + 1, position[1])) in [kFloor]
 
     def IsItDownWall(self, position):
         return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [
-            kFloor] and self.GetTile((position[0], position[1] + 1)) in [kEmpty, kColumn]
+            kFloor] and self.GetTile((position[0], position[1] + 1)) in [kEmpty, kColumn, kBoardOfMap]
 
     def IsItUpWall(self, position):
         return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kEmpty,
-                                                                                                        kColumn] and \
+                                                                                                        kColumn,
+                                                                                                        kBoardOfMap] and \
             self.GetTile(
                 (position[0], position[1] + 1)) in [kFloor]
 
@@ -767,6 +810,7 @@ class MapGenerator:
                     self.dfs.DFSForPaths((i, j))
                     for k in self.dfs.GetPath():
                         self.main_matrix[k[0]][k[1]] = kPath
+                    self.dfs.counter_for_doors = 1
         self.dfs.Clear()
 
     def SetDoorWaysOnMap(self):
@@ -838,8 +882,7 @@ class MapGenerator:
         for i in range(1, len(self.main_matrix) - 1):
             for j in range(1, len(self.main_matrix[0]) - 1):
                 if self.GetTile((i, j)) in [kDoor]:
-                    test = []
-                    self.dfs.DFSOnTheSpecificTiles((i, j), matrix, kWalls + [kFloor, kDoor, kPath], test)
+                    self.dfs.DFSOnTheSpecificTiles((i, j), matrix, kWalls + [kFloor, kDoor, kPath])
                     sign = True
                     break
             if sign:
@@ -869,6 +912,7 @@ class DFSAlgo:
         self.parents.clear()
         self.path.clear()
         self.used.clear()
+        self.counter_for_doors = 1
 
     def DFSForPaths(self, vertex):
         test = self.map.GetAround(vertex)
@@ -882,11 +926,12 @@ class DFSAlgo:
                                     (j[0], j[1] + 2)) is not None or self.used.get(
                                 (j[0] - 2, j[1])) is not None or self.used.get((j[0] + 2, j[1])) is not None:
                                 if self.parents.get(vertex)[0] == j[0] or self.parents.get(vertex)[1] == j[1]:
-                                    if self.counter_for_doors % self.freq_of_doors == 0:
-                                        self.counter_for_doors = 1
-                                        self.RandFreq()
-                                        self.map.main_matrix[j[0]][j[1]] = kDoor
-                                    self.counter_for_doors += 1
+                                    self.map.main_matrix[j[0]][j[1]] = kProbDoor
+                                    # if self.counter_for_doors % self.freq_of_doors == 0:
+                                    #     self.counter_for_doors = 1
+                                    #     self.RandFreq()
+                                    #     self.map.main_matrix[j[0]][j[1]] = kDoor
+                                    # self.counter_for_doors += 1
                     if j == self.parents.get(vertex):
                         continue
 
@@ -929,22 +974,43 @@ class DFSAlgo:
             if self.map.IsThereDeadEnd(vertex, self.parents.get(vertex)):
                 self.map.main_matrix[vertex[0]][vertex[1]] = kEmpty
 
-    def RecursiveDFSOnTheSpecific(self, vertex, final_matrix, tiles, keys, flag):
+    def DFSForSetDoors(self, vertex):
+        if self.used.get(vertex) is not None:
+            return
+        self.used[vertex] = True
+        if self.counter_for_doors < self.freq_of_doors:
+            self.counter_for_doors += 1
+        self.path.append(vertex)
+        if self.map.GetTile(vertex) in [kProbDoor] and self.counter_for_doors % self.freq_of_doors == 0:
+            # if self.map.GetTile(vertex) in [kProbDoor]:
+            self.map.main_matrix[vertex[0]][vertex[1]] = kDoor
+            self.RandFreq()
+            self.counter_for_doors = 0
+        for i in self.map.GetNeighbours(vertex):
+            if self.used.get(i) is None and i != self.parents.get(vertex) and self.map.GetTile(i) in [kProbDoor, kDoor,
+                                                                                                      kUpWall]:
+                self.parents[i] = vertex
+                self.DFSForSetDoors(i)
+
+    def RecursiveDFSOnTheSpecific(self, vertex, final_matrix, tiles, current_depth, flag=None, keys=None, depth=100000):
         self.used[vertex] = True
         self.path.append(vertex)
         final_matrix.append((vertex, self.map.GetTile(vertex)))
+        if current_depth > depth:
+            return
         for i in self.map.GetNeighbours(vertex):
             if self.map.GetTile(i) in tiles:
                 if flag == 'path':
                     if self.map.GetTile(i) in [kDoor] and self.map.GetTile(vertex) in [kPath]:
                         keys.append(vertex)
                 if flag == 'room':
-                    if self.map.GetTile(i) in [kDoor] and self.map.GetTile(vertex) in [kFloor]:
-                        keys.append(vertex)
+                    if self.map.GetTile(i) in [kDoor]:
+                        keys.append(i)
                 if self.used.get(i) is None and i != self.parents.get(vertex):
                     self.parents[i] = vertex
-                    self.RecursiveDFSOnTheSpecific(i, final_matrix, tiles, keys, flag)
+                    self.RecursiveDFSOnTheSpecific(i, final_matrix, tiles, current_depth=current_depth + 1, flag=flag,
+                                                   keys=keys, depth=depth)
 
-    def DFSOnTheSpecificTiles(self, vertex, final_matrix, tiles, keys, flag='room'):
+    def DFSOnTheSpecificTiles(self, vertex, final_matrix, tiles, keys=None, flag=None, depth=1000000):
         self.Clear()
-        self.RecursiveDFSOnTheSpecific(vertex, final_matrix, tiles, keys, flag)
+        self.RecursiveDFSOnTheSpecific(vertex, final_matrix, tiles, keys=keys, current_depth=0, flag=flag, depth=depth)
