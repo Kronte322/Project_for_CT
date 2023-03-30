@@ -1,161 +1,149 @@
 import random
 import time
+from src.back.constants_for_map import *
 
-random.seed(time.time())
-# random.seed(12)
-
-kNumOfBasicRooms = 50
-# kNumOfColumns = 0
-kNumOfColumns = 35
-kNumOfSemiBasicRooms = 50
-
-kMaxNumOfRoomsInSemiBasic = 2
-
-kMinWidthOfBasicRoom = 5
-kMaxWidthOfBasicRoom = 10
-# kMinWidthOfBasicRoom = 5
-# kMaxWidthOfBasicRoom = 6
-
-kMinWidthOfColumn = 1
-kMaxWidthOfColumn = 3
-
-kNumOfRoomsOnMap = 10000000
-kNumOfAdditionalRooms = 12
-# kNumOfAdditionalRooms = 0
-kMinFreqOfDoor = 10
-kMaxFreqOfDoor = 15
-
-kColumn = 'C'
-kDoor = 'D'
-kSign = 'S'
-kFloor = '-'
-kPath = 'P'
-kUpWall = 'UX'
-kDownWall = 'DX'
-kLeftWall = 'LX'
-kRightWall = 'RX'
-kLeftDownInCorner = 'LDIC'
-kLeftDownOutCorner = 'LDOC'
-kRightDownInCorner = 'RDIC'
-kRightDownOutCorner = 'RDOC'
-kProbDoor = 'PD'
-
-kWalls = [kUpWall, kDownWall, kLeftWall, kRightWall, kDoor, kLeftDownInCorner, kLeftDownOutCorner, kRightDownOutCorner,
-          kRightDownInCorner]
-
-kEmpty = 'E'
-kOneWidthPath = 'O'
-kBoardOfMap = 'B'
+# random.seed(time.time())
+random.seed(12)
 
 
-class MapGenerator:
-    def __init__(self):
-        self.main_matrix = []
-        self.basic_rooms = []
-        self.columns = []
-        self.size = []
+class MapBuilder:
+    basic_rooms = []
+    columns = []
 
-    def GenerateMap(self, size=(30, 20)):
-        self.main_matrix = []
-        self.basic_rooms = []
-        self.size = size
-        self.FillMatrix()
-        self.SetBoardsOfMap()
-        self.GenerateColumns()
-        self.GenerateBasicRooms()
-        self.GenerateMapWithRooms()
-        self.AdditionalGeneration()
-        self.PostProcessing()
-        return self.main_matrix
+    @staticmethod
+    def GenerateMap(size=(30, 20)):
+        result = MapBuilder.GetClearMap(size)
+        MapBuilder.SetBoardsOfMap(result)
+        MapBuilder.GenerateColumns()
+        MapBuilder.GenerateBasicRooms()
+        MapBuilder.GenerateMapWithRooms(result)
+        MapBuilder.AdditionalGeneration(result)
+        MapBuilder.PostProcessing(result)
+        return result
 
-    def SetMatrix(self, matrix):
-        self.main_matrix = matrix
-        self.size = [len(matrix), len(matrix[0])]
-
-    def IsItWallForDoor(self, position: tuple):
-        if self.GetTile(position) in [kUpWall]:
-            if self.GetTile((position[0], position[1] + 1)) in [kUpWall, kDoor] and self.GetTile(
-                    (position[0], position[1] - 1)) in [kUpWall, kDoor]:
-                if self.GetTile((position[0] - 1, position[1])) in [kEmpty] and self.GetTile(
-                        (position[0] + 1, position[1])) in [kFloor]:
+    @staticmethod
+    def IsItWallForDoor(main_matrix, position: tuple):
+        if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL]:
+            if MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [CHAR_FOR_UP_WALL,
+                                                                                   CHAR_FOR_DOOR] and MapBuilder.GetTile(
+                main_matrix,
+                (position[0], position[1] - 1)) in [CHAR_FOR_UP_WALL, CHAR_FOR_DOOR]:
+                if MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in [
+                    CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix,
+                                                           (position[0] + 1, position[1])) in [CHAR_FOR_FLOR]:
                     return True
-                if self.GetTile((position[0] - 1, position[1])) in [kFloor] and self.GetTile(
-                        (position[0] + 1, position[1])) in [kEmpty]:
+                if MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in [
+                    CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix,
+                                                          (position[0] + 1, position[1])) in [CHAR_FOR_EMPTY]:
                     return True
-            if self.GetTile((position[0] + 1, position[1])) in [kUpWall, kDoor] and self.GetTile(
-                    (position[0] - 1, position[1])) in [kUpWall, kDoor]:
-                if self.GetTile((position[0], position[1] - 1)) in [kEmpty] and self.GetTile(
-                        (position[0], position[1] + 1)) in [kFloor]:
+            if MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_UP_WALL,
+                                                                                   CHAR_FOR_DOOR] and MapBuilder.GetTile(
+                main_matrix,
+                (position[0] - 1, position[1])) in [CHAR_FOR_UP_WALL, CHAR_FOR_DOOR]:
+                if MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                    CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix,
+                                                           (position[0], position[1] + 1)) in [CHAR_FOR_FLOR]:
                     return True
-                if self.GetTile((position[0], position[1] - 1)) in [kFloor] and self.GetTile(
-                        (position[0], position[1] + 1)) in [kEmpty]:
+                if MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                    CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix,
+                                                          (position[0], position[1] + 1)) in [CHAR_FOR_EMPTY]:
                     return True
         return False
 
-    def IsThereCorner(self, position: tuple):
-        if self.IsThereAnyTile(position, [kEmpty]):
-            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
+    @staticmethod
+    def IsThereCorner(main_matrix, position: tuple):
+        if MapBuilder.IsThereAnyTile(main_matrix, position, [CHAR_FOR_EMPTY]):
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+                    position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
-            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+                    position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
-            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] + 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+                    position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
-            if self.GetTile(position) in [kUpWall] and self.GetTile((position[0] + 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
-                return True
-        return False
-
-    def IsThereCutCorner(self, position: tuple):
-        if self.IsThereAnyTile(position, [kEmpty]):
-            if self.GetTile(position) in [kFloor] and self.GetTile((position[0] - 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
-                return True
-            if self.GetTile(position) in [kFloor] and self.GetTile((position[0] - 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
-                return True
-            if self.GetTile(position) in [kFloor] and self.GetTile((position[0] + 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
-                return True
-            if self.GetTile(position) in [kFloor] and self.GetTile((position[0] + 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+                    position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
         return False
 
-    def IsThereCutCornerAfterCreate(self, position: tuple):
-        if self.IsThereAnyTile(position, [kFloor]):
-            if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] - 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
+    @staticmethod
+    def IsThereCutCorner(main_matrix, position: tuple):
+        if MapBuilder.IsThereAnyTile(main_matrix, position, [CHAR_FOR_EMPTY]):
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+                    position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
-            if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] - 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+                    position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
-            if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] + 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]:
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+                    position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
-            if self.GetTile(position) in [kEmpty] and self.GetTile((position[0] + 1, position[1])) in [
-                kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kUpWall]:
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+                    position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                CHAR_FOR_UP_WALL]:
                 return True
         return False
 
-    def GetTile(self, position: tuple):
-        return self.main_matrix[position[0]][position[1]]
+    @staticmethod
+    def IsThereCutCornerAfterCreate(main_matrix, position: tuple):
+        if MapBuilder.IsThereAnyTile(main_matrix, position, [CHAR_FOR_FLOR]):
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
+                    position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                CHAR_FOR_UP_WALL]:
+                return True
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
+                    position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                CHAR_FOR_UP_WALL]:
+                return True
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
+                    position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                CHAR_FOR_UP_WALL]:
+                return True
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
+                    position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
+                CHAR_FOR_UP_WALL]:
+                return True
+        return False
 
-    def GetNeighbours(self, position: tuple):
+    @staticmethod
+    def GetTile(main_matrix, position: tuple):
+        return main_matrix[position[0]][position[1]]
+
+    @staticmethod
+    def GetNeighbours(main_matrix, position: tuple):
         result = []
         if position[0] > 0:
             result.append((position[0] - 1, position[1]))
-        if position[0] < len(self.main_matrix) - 1:
+        if position[0] < len(main_matrix) - 1:
             result.append((position[0] + 1, position[1]))
         if position[1] > 0:
             result.append((position[0], position[1] - 1))
-        if position[1] < len(self.main_matrix[0]) - 1:
+        if position[1] < len(main_matrix[0]) - 1:
             result.append((position[0], position[1] + 1))
         return result
 
-    def GetAround(self, position: tuple):
+    @staticmethod
+    def GetAround(main_matrix, position: tuple):
         result = []
         interm = []
 
@@ -167,7 +155,7 @@ class MapGenerator:
             interm.append((position[0] - 1, position[1]))
         else:
             interm.append((-1, -1))
-        if position[0] > 0 and position[1] < len(self.main_matrix[0]) - 1:
+        if position[0] > 0 and position[1] < len(main_matrix[0]) - 1:
             interm.append((position[0] - 1, position[1] + 1))
         else:
             interm.append((-1, -1))
@@ -180,7 +168,7 @@ class MapGenerator:
         else:
             interm.append((-1, -1))
         interm.append((position[0], position[1]))
-        if position[1] < len(self.main_matrix[0]) - 1:
+        if position[1] < len(main_matrix[0]) - 1:
             interm.append((position[0], position[1] + 1))
         else:
             interm.append((-1, -1))
@@ -188,15 +176,15 @@ class MapGenerator:
 
         interm.clear()
 
-        if position[0] < len(self.main_matrix) - 1 and position[1] > 0:
+        if position[0] < len(main_matrix) - 1 and position[1] > 0:
             interm.append((position[0] + 1, position[1] - 1))
         else:
             interm.append((-1, -1))
-        if position[0] < len(self.main_matrix) - 1:
+        if position[0] < len(main_matrix) - 1:
             interm.append((position[0] + 1, position[1]))
         else:
             interm.append((-1, -1))
-        if position[0] < len(self.main_matrix) - 1 and position[1] < len(self.main_matrix[0]) - 1:
+        if position[0] < len(main_matrix) - 1 and position[1] < len(main_matrix[0]) - 1:
             interm.append((position[0] + 1, position[1] + 1))
         else:
             interm.append((-1, -1))
@@ -206,13 +194,15 @@ class MapGenerator:
 
         return result
 
-    def GetLeftAround(self, position):
-        around = self.GetAround(position).copy()
+    @staticmethod
+    def GetLeftAround(main_matrix, position):
+        around = MapBuilder.GetAround(main_matrix, position).copy()
         around.pop()
         return around
 
-    def GetUpAround(self, position):
-        around = self.GetAround(position)
+    @staticmethod
+    def GetUpAround(main_matrix, position):
+        around = MapBuilder.GetAround(main_matrix, position)
         res = []
         for i in range(len(around)):
             interm = []
@@ -221,15 +211,17 @@ class MapGenerator:
             res.append(interm)
         return res
 
-    def GetRightAround(self, position):
-        around = self.GetAround(position)
+    @staticmethod
+    def GetRightAround(main_matrix, position):
+        around = MapBuilder.GetAround(main_matrix, position)
         res = []
         for i in range(1, len(around)):
             res.append(around[i])
         return res
 
-    def GetDownAround(self, position):
-        around = self.GetAround(position)
+    @staticmethod
+    def GetDownAround(main_matrix, position):
+        around = MapBuilder.GetAround(main_matrix, position)
         res = []
         for i in range(len(around)):
             interm = []
@@ -240,25 +232,27 @@ class MapGenerator:
 
     # def IsAbleToMove(self, position):
 
-    def GetAroundForDFS(self, position, parent):
+    @staticmethod
+    def GetAroundForDFS(main_matrix, position, parent):
         if position[0] > parent[0]:
-            return self.GetLeftAround(parent)
+            return MapBuilder.GetLeftAround(main_matrix, parent)
         if position[0] < parent[0]:
-            return self.GetRightAround(parent)
+            return MapBuilder.GetRightAround(main_matrix, parent)
         if position[1] > parent[1]:
-            return self.GetUpAround(parent)
+            return MapBuilder.GetUpAround(main_matrix, parent)
         if position[1] < parent[1]:
-            return self.GetDownAround(parent)
+            return MapBuilder.GetDownAround(main_matrix, parent)
 
-    def GetAroundForDeadEnds(self, position, parent):
+    @staticmethod
+    def GetAroundForDeadEnds(main_matrix, position, parent):
         if position[0] > parent[0]:
-            return self.GetRightAround(position)
+            return MapBuilder.GetRightAround(main_matrix, position)
         if position[0] < parent[0]:
-            return self.GetLeftAround(position)
+            return MapBuilder.GetLeftAround(main_matrix, position)
         if position[1] > parent[1]:
-            return self.GetDownAround(position)
+            return MapBuilder.GetDownAround(main_matrix, position)
         if position[1] < parent[1]:
-            return self.GetUpAround(position)
+            return MapBuilder.GetUpAround(main_matrix, position)
 
     def WhatSideMyParent(self, position, parent):
         if position[0] > parent[0]:
@@ -270,74 +264,81 @@ class MapGenerator:
         if position[1] < parent[1]:
             return 'U'
 
-    def NumOfTiles(self, list_of_tiles, position):
+    @staticmethod
+    def NumOfTiles(main_matrix, list_of_tiles, position):
         res = 0
         for i in list_of_tiles:
             for j in i:
                 if j not in [(-1, -1), position]:
-                    if self.GetTile(j) not in [kEmpty, kBoardOfMap]:
+                    if MapBuilder.GetTile(main_matrix, j) not in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
                         res += 1
         return res
 
-    def IsThereDeadEnd(self, position, parent_position):
-        if self.NumOfTiles(self.GetAroundForDeadEnds(position, parent_position), position) == 0:
+    @staticmethod
+    def IsThereDeadEnd(main_matrix, position, parent_position):
+        if MapBuilder.NumOfTiles(main_matrix, MapBuilder.GetAroundForDeadEnds(main_matrix, position, parent_position),
+                                 position) == 0:
             return True
         return False
 
-    def GetMap(self):
-        return self.main_matrix
-
-    def FillMatrix(self):
-        for i in range(self.size[0]):
+    @staticmethod
+    def GetClearMap(size):
+        result = []
+        for i in range(size[0]):
             interm = []
-            for j in range(self.size[1]):
-                interm.append(kEmpty)
-            self.main_matrix.append(interm)
+            for j in range(size[1]):
+                interm.append(CHAR_FOR_EMPTY)
+            result.append(interm)
+        return result
 
-    def GenerateBasicRooms(self):
-        for i in range(kNumOfBasicRooms):
+    @staticmethod
+    def GenerateBasicRooms():
+        for i in range(NUM_OF_GENERATED_BASIC_ROOMS):
             interm = []
             x_coord = random.randrange(
-                kMinWidthOfBasicRoom, kMaxWidthOfBasicRoom)
+                MIN_WIDTH_OF_BASIC_ROOM, MAX_WIDTH_OF_BASIC_ROOM)
             y_coord = random.randrange(
-                kMinWidthOfBasicRoom, kMaxWidthOfBasicRoom)
+                MIN_WIDTH_OF_BASIC_ROOM, MAX_WIDTH_OF_BASIC_ROOM)
             right_down_corner = (x_coord, y_coord)
             for i in range(right_down_corner[0]):
                 interm_array = []
                 for j in range(right_down_corner[1]):
-                    interm_array.append(kFloor)
+                    interm_array.append(CHAR_FOR_FLOR)
                 interm.append(interm_array)
-            self.basic_rooms.append(interm)
+            MapBuilder.basic_rooms.append(interm)
 
-    def GenerateColumns(self):
-        for i in range(kNumOfColumns):
+    @staticmethod
+    def GenerateColumns():
+        for i in range(NUM_OF_GENERATED_COLUMNS):
             interm = []
             x_coord = random.randrange(
-                kMinWidthOfColumn, kMaxWidthOfColumn)
+                MIN_WIDTH_OF_COLUMN, MAX_WIDTH_OF_COLUMN)
             y_coord = random.randrange(
-                kMinWidthOfColumn, kMaxWidthOfColumn)
+                MIN_WIDTH_OF_COLUMN, MAX_WIDTH_OF_COLUMN)
             right_down_corner = (x_coord, y_coord)
             for i in range(right_down_corner[0]):
                 interm_array = []
                 for j in range(right_down_corner[1]):
-                    interm_array.append(kEmpty)
+                    interm_array.append(CHAR_FOR_EMPTY)
                 interm.append(interm_array)
-            self.columns.append(interm)
+            MapBuilder.columns.append(interm)
 
-    def GetSizeRoom(self, basic_room):
+    @staticmethod
+    def GetSizeRoom(basic_room):
         width = len(basic_room)
         height = len(basic_room[0])
-        return (width, height)
+        return width, height
 
-    def IsThereIntersec(self, room, pos_of_room: tuple, list_of_tiles=[kEmpty]) -> bool:
-        size_of_room = self.GetSizeRoom(room)
+    @staticmethod
+    def IsThereIntersec(main_matrix, room, pos_of_room: tuple, list_of_tiles=[CHAR_FOR_EMPTY]) -> bool:
+        size_of_room = MapBuilder.GetSizeRoom(room)
         bounds_for_loop = []
         if pos_of_room[0] > 1:
             bounds_for_loop.append(-2)
         else:
             bounds_for_loop.append(-1)
 
-        if pos_of_room[0] + size_of_room[0] < len(self.main_matrix) - 1:
+        if pos_of_room[0] + size_of_room[0] < len(main_matrix) - 1:
             bounds_for_loop.append(size_of_room[0] + 2)
         else:
             bounds_for_loop.append(size_of_room[0] + 1)
@@ -347,75 +348,77 @@ class MapGenerator:
         else:
             bounds_for_loop.append(-1)
 
-        if pos_of_room[1] + size_of_room[1] < len(self.main_matrix[0]) - 1:
+        if pos_of_room[1] + size_of_room[1] < len(main_matrix[0]) - 1:
             bounds_for_loop.append(size_of_room[1] + 2)
         else:
             bounds_for_loop.append(size_of_room[1] + 1)
 
         for i in range(bounds_for_loop[0], bounds_for_loop[1]):
             for j in range(bounds_for_loop[2], bounds_for_loop[3]):
-                if self.main_matrix[pos_of_room[0] + i][pos_of_room[1] + j] not in list_of_tiles:
+                if main_matrix[pos_of_room[0] + i][pos_of_room[1] + j] not in list_of_tiles:
                     return True
         return False
 
-    def GenerateMapWithRooms(self):
+    @staticmethod
+    def GenerateMapWithRooms(main_matrix):
         num_of_generated_rooms = 0
         num_of_generations = 0
-        while num_of_generated_rooms != kNumOfRoomsOnMap:
+        while num_of_generated_rooms != NUM_OF_BASIC_ROOMS_ON_MAP:
 
             if num_of_generations == 1000:
                 break
             num_of_generations += 1
 
-            num_of_basic_room = random.randrange(0, kNumOfBasicRooms)
-            basic_room = self.basic_rooms[num_of_basic_room]
-            width_of_basic_room = self.GetSizeRoom(basic_room)[0]
-            height_of_basic_room = self.GetSizeRoom(basic_room)[1]
-            x_coord = random.randrange(2, self.size[0] - width_of_basic_room - 1)
-            y_coord = random.randrange(2, self.size[1] - height_of_basic_room - 1)
+            num_of_basic_room = random.randrange(0, NUM_OF_GENERATED_BASIC_ROOMS)
+            basic_room = MapBuilder.basic_rooms[num_of_basic_room]
+            width_of_basic_room, height_of_basic_room = MapBuilder.GetSizeRoom(basic_room)
+            x_coord = random.randrange(2, len(main_matrix) - width_of_basic_room - 1)
+            y_coord = random.randrange(2, len(main_matrix[0]) - height_of_basic_room - 1)
             left_corner_position = (x_coord, y_coord)
             sign = False
             counter = 0
-            while sign != True:
+            while sign is not True:
                 if counter == 50:
                     break
 
                 counter += 1
-                if not self.IsThereIntersec(basic_room, left_corner_position):
+                if not MapBuilder.IsThereIntersec(main_matrix, basic_room, left_corner_position):
                     sign = True
                     num_of_generated_rooms += 1
                     for i in range(-1, width_of_basic_room + 1):
                         for j in range(-1, height_of_basic_room + 1):
                             if i == -1 or i == width_of_basic_room or j == -1 or j == height_of_basic_room:
-                                self.main_matrix[left_corner_position[0] +
-                                                 i][left_corner_position[1] + j] = kUpWall
+                                main_matrix[left_corner_position[0] +
+                                            i][left_corner_position[1] + j] = CHAR_FOR_UP_WALL
                             else:
-                                self.main_matrix[left_corner_position[0] +
-                                                 i][left_corner_position[1] + j] = kFloor
+                                main_matrix[left_corner_position[0] +
+                                            i][left_corner_position[1] + j] = CHAR_FOR_FLOR
 
-    def GenerateMapWithColumns(self):
+    @staticmethod
+    def GenerateMapWithColumns(main_matrix):
         num_of_generated_rooms = 0
         num_of_generations = 0
-        while num_of_generated_rooms != kNumOfColumns:
+        while num_of_generated_rooms != NUM_OF_COLUMNS_ON_MAP:
             if num_of_generations == 1000:
                 break
             num_of_generations += 1
 
-            num_of_column = random.randrange(0, kNumOfColumns)
-            column = self.columns[num_of_column]
-            width_of_column = self.GetSizeRoom(column)[0] + 2
-            height_of_column = self.GetSizeRoom(column)[1] + 2
-            x_coord = random.randrange(2, self.size[0] - width_of_column - 2)
-            y_coord = random.randrange(2, self.size[1] - height_of_column - 2)
+            num_of_column = random.randrange(0, NUM_OF_COLUMNS_ON_MAP)
+            column = MapBuilder.columns[num_of_column]
+            width_of_column = MapBuilder.GetSizeRoom(column)[0] + 2
+            height_of_column = MapBuilder.GetSizeRoom(column)[1] + 2
+            x_coord = random.randrange(2, len(main_matrix) - width_of_column - 2)
+            y_coord = random.randrange(2, len(main_matrix[0]) - height_of_column - 2)
             left_corner_position = (x_coord - 2, y_coord - 2)
             sign = False
             counter = 0
-            while sign != True:
+            while sign is not True:
                 if counter == 50:
                     break
 
                 counter += 1
-                if not self.IsThereIntersec(column, left_corner_position, list_of_tiles=[kFloor]):
+                if not MapBuilder.IsThereIntersec(main_matrix, column, left_corner_position,
+                                                  list_of_tiles=[CHAR_FOR_FLOR]):
                     width_of_column -= 2
                     height_of_column -= 2
                     x_coord += 2
@@ -425,485 +428,539 @@ class MapGenerator:
                     for i in range(-1, width_of_column + 1):
                         for j in range(-1, height_of_column + 1):
                             if i == -1 or i == width_of_column or j == -1 or j == height_of_column:
-                                self.main_matrix[left_corner_position[0] +
-                                                 i][left_corner_position[1] + j] = kUpWall
+                                main_matrix[left_corner_position[0] +
+                                            i][left_corner_position[1] + j] = CHAR_FOR_UP_WALL
                             else:
-                                self.main_matrix[left_corner_position[0] +
-                                                 i][left_corner_position[1] + j] = kColumn
+                                main_matrix[left_corner_position[0] +
+                                            i][left_corner_position[1] + j] = CHAR_FOR_COLUMN
 
-    def IsInCrossAnyTile(self, position, tiles) -> bool:
+    @staticmethod
+    def IsInCrossAnyTile(main_matrix, position, tiles) -> bool:
         if position[0] > 0:
-            if self.main_matrix[position[0] - 1][position[1]] in tiles:
+            if main_matrix[position[0] - 1][position[1]] in tiles:
                 return True
-        if position[0] < len(self.main_matrix) - 1:
-            if self.main_matrix[position[0] + 1][position[1]] in tiles:
+        if position[0] < len(main_matrix) - 1:
+            if main_matrix[position[0] + 1][position[1]] in tiles:
                 return True
         if position[1] > 0:
-            if self.main_matrix[position[0]][position[1] - 1] in tiles:
+            if main_matrix[position[0]][position[1] - 1] in tiles:
                 return True
-        if position[1] < len(self.main_matrix) - 1:
-            if self.main_matrix[position[0]][position[1] + 1] in tiles:
+        if position[1] < len(main_matrix) - 1:
+            if main_matrix[position[0]][position[1] + 1] in tiles:
                 return True
-        if position[0] == 0 or position[0] == len(self.main_matrix) - 1 or position[1] == 0 or position[1] == len(
-                self.main_matrix[0]) - 1:
+        if position[0] == 0 or position[0] == len(main_matrix) - 1 or position[1] == 0 or position[1] == len(
+                main_matrix[0]) - 1:
             return True
         return False
 
-    def IsThereAnyTile(self, position, tiles) -> bool:
-        if self.main_matrix[position[0] - 1][position[1]] in tiles:
+    @staticmethod
+    def IsThereAnyTile(main_matrix, position, tiles) -> bool:
+        if main_matrix[position[0] - 1][position[1]] in tiles:
             return True
-        if self.main_matrix[position[0] + 1][position[1]] in tiles:
+        if main_matrix[position[0] + 1][position[1]] in tiles:
             return True
-        if self.main_matrix[position[0]][position[1] - 1] in tiles:
+        if main_matrix[position[0]][position[1] - 1] in tiles:
             return True
-        if self.main_matrix[position[0]][position[1] + 1] in tiles:
+        if main_matrix[position[0]][position[1] + 1] in tiles:
             return True
-        if self.main_matrix[position[0] - 1][position[1] + 1] in tiles:
+        if main_matrix[position[0] - 1][position[1] + 1] in tiles:
             return True
-        if self.main_matrix[position[0] - 1][position[1] - 1] in tiles:
+        if main_matrix[position[0] - 1][position[1] - 1] in tiles:
             return True
-        if self.main_matrix[position[0] + 1][position[1] + 1] in tiles:
+        if main_matrix[position[0] + 1][position[1] + 1] in tiles:
             return True
-        if self.main_matrix[position[0] + 1][position[1] - 1] in tiles:
+        if main_matrix[position[0] + 1][position[1] - 1] in tiles:
             return True
         return False
 
-    def AdditionalGeneration(self):
+    @staticmethod
+    def AdditionalGeneration(main_matrix):
         num_of_generated = 0
-        while num_of_generated != kNumOfAdditionalRooms:
+        while num_of_generated != NUM_OF_ADDITION_ROOMS_ON_MAP:
             num_of_generated += 1
-            num_of_basic_room = random.randrange(0, kNumOfBasicRooms)
-            basic_room = self.basic_rooms[num_of_basic_room]
-            width_of_basic_room = self.GetSizeRoom(basic_room)[0]
-            height_of_basic_room = self.GetSizeRoom(basic_room)[1]
-            x_coord = random.randrange(2, self.size[0] - width_of_basic_room - 1)
-            y_coord = random.randrange(2, self.size[1] - height_of_basic_room - 1)
+            num_of_basic_room = random.randrange(0, NUM_OF_GENERATED_BASIC_ROOMS)
+            basic_room = MapBuilder.basic_rooms[num_of_basic_room]
+            width_of_basic_room = MapBuilder.GetSizeRoom(basic_room)[0]
+            height_of_basic_room = MapBuilder.GetSizeRoom(basic_room)[1]
+            x_coord = random.randrange(2, len(main_matrix) - width_of_basic_room - 1)
+            y_coord = random.randrange(2, len(main_matrix[0]) - height_of_basic_room - 1)
             left_corner_position = (x_coord, y_coord)
 
             for i in range(-1, width_of_basic_room + 1):
                 for j in range(-1, height_of_basic_room + 1):
                     if i == -1 or i == width_of_basic_room or j == -1 or j == height_of_basic_room:
-                        if self.main_matrix[left_corner_position[0] +
-                                            i][left_corner_position[1] + j] == kEmpty:
-                            self.main_matrix[left_corner_position[0] +
-                                             i][left_corner_position[1] + j] = kUpWall
-                        elif self.main_matrix[left_corner_position[0] +
-                                              i][left_corner_position[1] + j] == kUpWall and not self.IsInCrossAnyTile(
-                            (left_corner_position[0] +
-                             i, left_corner_position[1] + j), [kEmpty, kBoardOfMap]):
-                            self.main_matrix[left_corner_position[0] +
-                                             i][left_corner_position[1] + j] = kFloor
+                        if main_matrix[left_corner_position[0] +
+                                       i][left_corner_position[1] + j] == CHAR_FOR_EMPTY:
+                            main_matrix[left_corner_position[0] +
+                                        i][left_corner_position[1] + j] = CHAR_FOR_UP_WALL
+                        elif main_matrix[left_corner_position[0] +
+                                         i][
+                            left_corner_position[1] + j] == CHAR_FOR_UP_WALL and not MapBuilder.IsInCrossAnyTile(
+                            main_matrix, (left_corner_position[0] + i, left_corner_position[1] + j),
+                            [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]):
+                            main_matrix[left_corner_position[0] +
+                                        i][left_corner_position[1] + j] = CHAR_FOR_FLOR
                     else:
-                        self.main_matrix[left_corner_position[0] +
-                                         i][left_corner_position[1] + j] = kFloor
+                        main_matrix[left_corner_position[0] +
+                                    i][left_corner_position[1] + j] = CHAR_FOR_FLOR
 
-    def IsThereAllFloors(self, position):
+    @staticmethod
+    def IsThereAllFloors(main_matrix, position):
         counter = 0
         if position[0] > 0:
-            if self.main_matrix[position[0] - 1][position[1]] in [kFloor, kUpWall]:
+            if main_matrix[position[0] - 1][position[1]] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
-        if position[0] < len(self.main_matrix[0]) - 1:
-            if self.main_matrix[position[0] + 1][position[1]] in [kFloor, kUpWall]:
+        if position[0] < len(main_matrix[0]) - 1:
+            if main_matrix[position[0] + 1][position[1]] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
         if position[1] > 0:
-            if self.main_matrix[position[0]][position[1] - 1] in [kFloor, kUpWall]:
+            if main_matrix[position[0]][position[1] - 1] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
-        if position[1] < len(self.main_matrix) - 1:
-            if self.main_matrix[position[0]][position[1] + 1] in [kFloor, kUpWall]:
+        if position[1] < len(main_matrix) - 1:
+            if main_matrix[position[0]][position[1] + 1] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
         if counter > 2:
             return True
         return False
 
-    def DeleteWallsOnDiagonal(self):
-        for i in range(len(self.main_matrix) - 1):
-            for j in range(len(self.main_matrix[0]) - 1):
-                if self.main_matrix[i][j] == kUpWall and self.main_matrix[i + 1][j] == kFloor and self.main_matrix[i][
-                    j + 1] == kFloor and self.main_matrix[i + 1][j + 1] == kUpWall:
-                    self.main_matrix[i + 1][j] = kUpWall
-                    self.main_matrix[i][j + 1] = kUpWall
-                elif self.main_matrix[i][j] == kFloor and self.main_matrix[i + 1][j] == kUpWall and self.main_matrix[i][
-                    j + 1] == kUpWall and self.main_matrix[i + 1][j + 1] == kFloor:
-                    self.main_matrix[i][j] = kUpWall
-                    self.main_matrix[i + 1][j + 1] = kUpWall
+    @staticmethod
+    def DeleteWallsOnDiagonal(main_matrix):
+        for i in range(len(main_matrix) - 1):
+            for j in range(len(main_matrix[0]) - 1):
+                if main_matrix[i][j] == CHAR_FOR_UP_WALL and main_matrix[i + 1][j] == CHAR_FOR_FLOR and \
+                        main_matrix[i][
+                            j + 1] == CHAR_FOR_FLOR and main_matrix[i + 1][j + 1] == CHAR_FOR_UP_WALL:
+                    main_matrix[i + 1][j] = CHAR_FOR_UP_WALL
+                    main_matrix[i][j + 1] = CHAR_FOR_UP_WALL
+                elif main_matrix[i][j] == CHAR_FOR_FLOR and main_matrix[i + 1][j] == CHAR_FOR_UP_WALL and \
+                        main_matrix[i][
+                            j + 1] == CHAR_FOR_UP_WALL and main_matrix[i + 1][j + 1] == CHAR_FOR_FLOR:
+                    main_matrix[i][j] = CHAR_FOR_UP_WALL
+                    main_matrix[i + 1][j + 1] = CHAR_FOR_UP_WALL
 
-    def OneWidthPaths(self):
-        self.OneWidthPathsHorizontal()
-        self.OneWidthPathsVertical()
+    @staticmethod
+    def DeleteWallsInsideRooms(main_matrix):
+        for i in range(len(main_matrix)):
+            for j in range(len(main_matrix[0])):
+                if main_matrix[i][j] == CHAR_FOR_UP_WALL:
+                    if MapBuilder.IsThereAllFloors(main_matrix, (i, j)) and not MapBuilder.IsInCrossAnyTile(
+                            main_matrix, (i, j), [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]):
+                        main_matrix[i][j] = CHAR_FOR_FLOR
 
-    def OneWidthPathsVertical(self):
-        for i in range(len(self.main_matrix)):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i][j - 1] == kUpWall and self.main_matrix[i][
-                    j + 1] == kUpWall:
-                    self.main_matrix[i][j] = kOneWidthPath
-
-    def OneWidthPathsHorizontal(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(len(self.main_matrix[0])):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i - 1][j] == kUpWall and \
-                        self.main_matrix[i + 1][
-                            j] == kUpWall:
-                    self.main_matrix[i][j] = kOneWidthPath
-
-    def TwoWidthPaths(self):
-        self.TwoWidthPathsHorizontal()
-        self.TwoWidthPathsVertical()
-
-    def TwoWidthPathsVertical(self):
-        for i in range(len(self.main_matrix)):
-            for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i][j - 1] == kUpWall and self.main_matrix[i][
-                    j + 1] == kEmpty and self.main_matrix[i][j + 2] == kUpWall:
-                    self.main_matrix[i][j] = kOneWidthPath
-                    self.main_matrix[i][j + 1] = kOneWidthPath
-
-    def TwoWidthPathsHorizontal(self):
-        for i in range(1, len(self.main_matrix) - 2):
-            for j in range(len(self.main_matrix[0])):
-                if self.main_matrix[i][j] == kEmpty and self.main_matrix[i - 1][j] == kUpWall and \
-                        self.main_matrix[i + 1][
-                            j] == kEmpty and self.main_matrix[i + 2][j] == kUpWall:
-                    self.main_matrix[i][j] = kOneWidthPath
-                    self.main_matrix[i + 1][j] = kOneWidthPath
-
-    def DeleteWallsInsideRooms(self):
-        for i in range(len(self.main_matrix)):
-            for j in range(len(self.main_matrix[0])):
-                if self.main_matrix[i][j] == kUpWall:
-                    if self.IsThereAllFloors((i, j)) and not self.IsInCrossAnyTile((i, j), [kEmpty, kBoardOfMap]):
-                        self.main_matrix[i][j] = kFloor
-
-    def IsThereDoorBetweenRooms(self, position: tuple):
-        if (self.GetTile(position) in [kEmpty] and self.GetTile((position[0] - 1, position[1])) in [
-            kUpWall] and self.GetTile((position[0] + 1, position[1])) in [kUpWall]) or (
-                self.GetTile(position) in [kEmpty] and self.GetTile((position[0], position[1] - 1)) in [
-            kUpWall] and self.GetTile((position[0], position[1] + 1)) in [kUpWall]):
-            if self.GetTile((position[0] - 1, position[1] + 1)) in [kUpWall] and self.GetTile(
-                    (position[0] - 1, position[1] - 1)) in [kUpWall]:
-                if self.GetTile((position[0] + 1, position[1] + 1)) in [kUpWall] and self.GetTile(
-                        (position[0] + 1, position[1] - 1)) in [kUpWall]:
+    @staticmethod
+    def IsThereDoorBetweenRooms(main_matrix, position: tuple):
+        if (MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
+                position[0] - 1, position[1])) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [
+                CHAR_FOR_UP_WALL]) or (
+                MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
+                position[0], position[1] - 1)) in [
+                    CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
+                    CHAR_FOR_UP_WALL]):
+            if MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1] + 1)) in [
+                CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix,
+                                                         (position[0] - 1, position[1] - 1)) in [CHAR_FOR_UP_WALL]:
+                if MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1] + 1)) in [
+                    CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix,
+                                                             (position[0] + 1, position[1] - 1)) in [CHAR_FOR_UP_WALL]:
                     return True
         return False
 
-    def PostProcessing(self):
-        self.DeleteWallsInsideRooms()
-        self.DeleteWallsOnDiagonal()
-        self.DeleteQuaterWalls()
-        self.dfs = DFSAlgo(self)
-        self.SetPathsOnMap()
-        self.GenerateMapWithColumns()
-        self.SetDoors()
-        self.DeleteCutCorners()
-        self.SetDoorsBetweenRooms()
-        self.DeleteDoubleDoors()
-        self.SetFloorInFrontOfDoor()
-        self.DeleteDeadEnds()
-        self.DeleteFakeDoors()
+    @staticmethod
+    def PostProcessing(main_matrix):
+        MapBuilder.DeleteWallsInsideRooms(main_matrix)
+        MapBuilder.DeleteWallsOnDiagonal(main_matrix)
+        MapBuilder.DeleteQuaterWalls(main_matrix)
+        MapBuilder.SetPathsOnMap(main_matrix)
+        MapBuilder.GenerateMapWithColumns(main_matrix)
+        MapBuilder.SetDoors(main_matrix)
+        MapBuilder.DeleteCutCorners(main_matrix)
+        MapBuilder.SetDoorsBetweenRooms(main_matrix)
+        MapBuilder.DeleteDoubleDoors(main_matrix)
+        MapBuilder.SetFloorInFrontOfDoor(main_matrix)
+        MapBuilder.DeleteDeadEnds(main_matrix)
+        MapBuilder.DeleteFakeDoors(main_matrix)
         list_of_corners = []
-        self.MakeCutCorners(list_of_corners)
-        self.DeleteNotConnectedComponents()
-        self.DeleteCutCornersAfterCreate(list_of_corners)
-        self.DeleteWrongWall()
-        self.DeleteCutCorners()
-        self.ParseWalls()
-        self.ParseCorners()
+        MapBuilder.MakeCutCorners(main_matrix, list_of_corners)
+        MapBuilder.DeleteNotConnectedComponents(main_matrix)
+        MapBuilder.DeleteCutCornersAfterCreate(main_matrix, list_of_corners)
+        MapBuilder.DeleteWrongWall(main_matrix)
+        MapBuilder.DeleteCutCorners(main_matrix)
+        MapBuilder.ParseWalls(main_matrix)
+        MapBuilder.ParseCorners(main_matrix)
 
-    def DeleteQuaterWalls(self):
-        for i in range(2, len(self.main_matrix) - 3):
-            for j in range(2, len(self.main_matrix[0]) - 3):
-                self.SupportDeleteQuater((i, j))
+    @staticmethod
+    def DeleteQuaterWalls(main_matrix):
+        for i in range(2, len(main_matrix) - 3):
+            for j in range(2, len(main_matrix[0]) - 3):
+                MapBuilder.SupportDeleteQuater(main_matrix, (i, j))
 
-    def SupportDeleteQuater(self, position):
+    @staticmethod
+    def SupportDeleteQuater(main_matrix, position):
         counter_for_walls = 0
         counter_for_floors = 0
         counter_for_empty = 0
         for i in range(3):
             for j in range(3):
-                if self.main_matrix[position[0] + i][position[1] + j] in [kFloor]:
+                if main_matrix[position[0] + i][position[1] + j] in [CHAR_FOR_FLOR]:
                     counter_for_floors += 1
-                elif self.main_matrix[position[0] + i][position[1] + j] in [kUpWall]:
+                elif main_matrix[position[0] + i][position[1] + j] in [CHAR_FOR_UP_WALL]:
                     counter_for_walls += 1
-                elif self.main_matrix[position[0] + i][position[1] + j] in [kEmpty]:
+                elif main_matrix[position[0] + i][position[1] + j] in [CHAR_FOR_EMPTY]:
                     counter_for_empty += 1
         if counter_for_walls >= 5 and counter_for_floors >= 1 and counter_for_empty >= 1:
             for i in range(3):
                 for j in range(3):
-                    self.main_matrix[position[0] + i][position[1] + j] = kEmpty
+                    main_matrix[position[0] + i][position[1] + j] = CHAR_FOR_EMPTY
             for i in range(3):
                 for j in range(3):
-                    if self.GetTile((position[0] + i, position[1] + j)) in [kEmpty]:
-                        if self.IsThereAnyTile((position[0] + i, position[1] + j), tiles=[kFloor]):
-                            self.main_matrix[position[0] + i][position[1] + j] = kUpWall
+                    if MapBuilder.GetTile(main_matrix, (position[0] + i, position[1] + j)) in [CHAR_FOR_EMPTY]:
+                        if MapBuilder.IsThereAnyTile(main_matrix, (position[0] + i, position[1] + j),
+                                                     tiles=[CHAR_FOR_FLOR]):
+                            main_matrix[position[0] + i][position[1] + j] = CHAR_FOR_UP_WALL
 
-    def SetDoors(self):
-        self.dfs.used.clear()
-        for i in range(1, len(self.main_matrix) - 2):
-            for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.GetTile((i, j)) in [kProbDoor]:
-                    self.dfs.DFSForSetDoors((i, j))
-        for i in range(1, len(self.main_matrix) - 2):
-            for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.GetTile((i, j)) in [kProbDoor]:
-                    self.main_matrix[i][j] = kUpWall
+    @staticmethod
+    def SetDoors(main_matrix):
+        dfs = DFSAlgoForMapBuilder()
+        for i in range(1, len(main_matrix) - 2):
+            for j in range(1, len(main_matrix[0]) - 2):
+                if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_POTENTIAL_DOOR]:
+                    dfs.DFSForSetDoors(main_matrix, (i, j))
+        for i in range(1, len(main_matrix) - 2):
+            for j in range(1, len(main_matrix[0]) - 2):
+                if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_POTENTIAL_DOOR]:
+                    main_matrix[i][j] = CHAR_FOR_UP_WALL
 
-    def IsItRightWall(self, position):
-        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [
-            kFloor] and self.GetTile((position[0] + 1, position[1])) in [kEmpty, kColumn, kBoardOfMap]
+    @staticmethod
+    def IsItRightWall(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+            position[0] - 1, position[1])) in [
+            CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_EMPTY,
+                                                                                                   CHAR_FOR_COLUMN,
+                                                                                                   CHAR_FOR_MAP_BOARD]
 
-    def IsItLeftWall(self, position):
-        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0] - 1, position[1])) in [kEmpty,
-                                                                                                        kColumn,
-                                                                                                        kBoardOfMap] and \
-            self.GetTile(
-                (position[0] + 1, position[1])) in [kFloor]
+    @staticmethod
+    def IsItLeftWall(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+            position[0] - 1, position[1])) in [
+            CHAR_FOR_EMPTY,
+            CHAR_FOR_COLUMN,
+            CHAR_FOR_MAP_BOARD] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_FLOR]
 
-    def IsItDownWall(self, position):
-        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [
-            kFloor] and self.GetTile((position[0], position[1] + 1)) in [kEmpty, kColumn, kBoardOfMap]
+    @staticmethod
+    def IsItDownWall(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+            position[0], position[1] - 1)) in [
+            CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [CHAR_FOR_EMPTY,
+                                                                                                   CHAR_FOR_COLUMN,
+                                                                                                   CHAR_FOR_MAP_BOARD]
 
-    def IsItUpWall(self, position):
-        return self.GetTile(position) in [kUpWall] and self.GetTile((position[0], position[1] - 1)) in [kEmpty,
-                                                                                                        kColumn,
-                                                                                                        kBoardOfMap] and \
-            self.GetTile(
-                (position[0], position[1] + 1)) in [kFloor]
+    @staticmethod
+    def IsItUpWall(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
+            position[0], position[1] - 1)) in [
+            CHAR_FOR_EMPTY,
+            CHAR_FOR_COLUMN,
+            CHAR_FOR_MAP_BOARD] and \
+            MapBuilder.GetTile(main_matrix,
+                               (position[0], position[1] + 1)) in [CHAR_FOR_FLOR]
 
-    def ParseWalls(self):
-        for i in range(1, len(self.main_matrix) - 2):
-            for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.IsItRightWall((i, j)):
-                    self.main_matrix[i][j] = kRightWall
-                elif self.IsItDownWall((i, j)):
-                    self.main_matrix[i][j] = kDownWall
-                elif self.IsItUpWall((i, j)):
-                    self.main_matrix[i][j] = kUpWall
-                elif self.IsItLeftWall((i, j)):
-                    self.main_matrix[i][j] = kLeftWall
+    @staticmethod
+    def ParseWalls(main_matrix):
+        for i in range(1, len(main_matrix) - 2):
+            for j in range(1, len(main_matrix[0]) - 2):
+                if MapBuilder.IsItRightWall(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_RIGHT_WALL
+                elif MapBuilder.IsItDownWall(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_DOWN_WALL
+                elif MapBuilder.IsItUpWall(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_UP_WALL
+                elif MapBuilder.IsItLeftWall(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_LEFT_WALL
 
-    def IsItLeftDownOutCorner(self, position):
-        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] - 1)) in kWalls \
-            and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
-                (position[0] + 1, position[1] - 1)) in [kFloor]
+    @staticmethod
+    def IsItLeftDownOutCorner(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                  (position[0],
+                                                                                                   position[
+                                                                                                       1] - 1)) in SET_WITH_WALLS \
+            and MapBuilder.GetTile(main_matrix,
+                                   (position[0] + 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                            (position[
+                                                                                                                 0] + 1,
+                                                                                                             position[
+                                                                                                                 1] - 1)) in [
+                CHAR_FOR_FLOR]
 
-    def IsItLeftDownInCorner(self, position):
-        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
-            and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
-                (position[0] - 1, position[1] + 1)) in [kEmpty, kColumn]
+    @staticmethod
+    def IsItLeftDownInCorner(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                  (position[0],
+                                                                                                   position[
+                                                                                                       1] + 1)) in SET_WITH_WALLS \
+            and MapBuilder.GetTile(main_matrix,
+                                   (position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                            (position[
+                                                                                                                 0] - 1,
+                                                                                                             position[
+                                                                                                                 1] + 1)) in [
+                CHAR_FOR_EMPTY, CHAR_FOR_COLUMN]
 
-    def IsItRightDownOutCorner(self, position):
-        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] - 1)) in kWalls \
-            and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
-                (position[0] - 1, position[1] - 1)) in [kFloor]
+    @staticmethod
+    def IsItRightDownOutCorner(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                  (position[0],
+                                                                                                   position[
+                                                                                                       1] - 1)) in SET_WITH_WALLS \
+            and MapBuilder.GetTile(main_matrix,
+                                   (position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                            (position[
+                                                                                                                 0] - 1,
+                                                                                                             position[
+                                                                                                                 1] - 1)) in [
+                CHAR_FOR_FLOR]
 
-    def IsItRightDownInCorner(self, position):
-        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
-            and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
-                (position[0] + 1, position[1] + 1)) in [kEmpty, kColumn]
+    @staticmethod
+    def IsItRightDownInCorner(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                  (position[0],
+                                                                                                   position[
+                                                                                                       1] + 1)) in SET_WITH_WALLS \
+            and MapBuilder.GetTile(main_matrix,
+                                   (position[0] + 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                            (position[
+                                                                                                                 0] + 1,
+                                                                                                             position[
+                                                                                                                 1] + 1)) in [
+                CHAR_FOR_EMPTY, CHAR_FOR_COLUMN]
 
-    def IsItLeftUpCorner(self, position):
-        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
-            and self.GetTile((position[0] + 1, position[1])) in kWalls and self.GetTile(
-                (position[0] + 1, position[1] + 1)) in [kFloor]
+    @staticmethod
+    def IsItLeftUpCorner(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                  (position[0],
+                                                                                                   position[
+                                                                                                       1] + 1)) in SET_WITH_WALLS \
+            and MapBuilder.GetTile(main_matrix,
+                                   (position[0] + 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                                            (position[
+                                                                                                                 0] + 1,
+                                                                                                             position[
+                                                                                                                 1] + 1)) in [
+                CHAR_FOR_FLOR]
 
-    def IsItRightUpCorner(self, position):
-        return self.GetTile(position) in kWalls and self.GetTile((position[0], position[1] + 1)) in kWalls \
-            and self.GetTile((position[0] - 1, position[1])) in kWalls and self.GetTile(
-                (position[0] - 1, position[1] + 1)) in [kFloor]
+    @staticmethod
+    def IsItRightUpCorner(main_matrix, position):
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1] + 1)) in [CHAR_FOR_FLOR]
 
-    def ParseCorners(self):
-        for i in range(1, len(self.main_matrix) - 2):
-            for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.IsItLeftDownInCorner((i, j)):
-                    self.main_matrix[i][j] = kLeftDownInCorner
-                elif self.IsItLeftDownOutCorner((i, j)):
-                    self.main_matrix[i][j] = kLeftDownOutCorner
-                elif self.IsItRightDownInCorner((i, j)):
-                    self.main_matrix[i][j] = kRightDownInCorner
-                elif self.IsItRightDownOutCorner((i, j)):
-                    self.main_matrix[i][j] = kRightDownOutCorner
-                elif self.IsItRightUpCorner((i, j)):
-                    self.main_matrix[i][j] = kRightWall
-                elif self.IsItLeftUpCorner((i, j)):
-                    self.main_matrix[i][j] = kLeftWall
+    @staticmethod
+    def ParseCorners(main_matrix):
+        for i in range(1, len(main_matrix) - 2):
+            for j in range(1, len(main_matrix[0]) - 2):
+                if MapBuilder.IsItLeftDownInCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_LEFT_DOWN_IN_CORNER
+                elif MapBuilder.IsItLeftDownOutCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_LEFT_DOWN_OUT_CORNER
+                elif MapBuilder.IsItRightDownInCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_RIGHT_DOWN_IN_CORNER
+                elif MapBuilder.IsItRightDownOutCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_DOWN_OUT_CORNER
+                elif MapBuilder.IsItRightUpCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_RIGHT_WALL
+                elif MapBuilder.IsItLeftUpCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_LEFT_WALL
 
-    def CountEmptyTiles(self, position):
-        list = self.GetAround(position)
+    @staticmethod
+    def CountEmptyTiles(main_matrix, position):
+        list = MapBuilder.GetAround(main_matrix, position)
         res = 0
         for i in list:
             for j in i:
-                if self.GetTile((j[0], j[1])) in [kEmpty, kBoardOfMap]:
+                if MapBuilder.GetTile(main_matrix, (j[0], j[1])) in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
                     res += 1
         return res
 
-    def IsThereWrongWall(self, position):
-        if self.GetTile(position) in [kUpWall] and self.CountEmptyTiles(position) > 5:
+    @staticmethod
+    def IsThereWrongWall(main_matrix, position):
+        if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.CountEmptyTiles(main_matrix,
+                                                                                                          position) > 5:
             return True
         return False
 
-    def DeleteWrongWall(self):
-        for i in range(1, len(self.main_matrix) - 2):
-            for j in range(1, len(self.main_matrix[0]) - 2):
-                if self.IsThereWrongWall((i, j)):
-                    self.main_matrix[i][j] = kEmpty
+    @staticmethod
+    def DeleteWrongWall(main_matrix):
+        for i in range(1, len(main_matrix) - 2):
+            for j in range(1, len(main_matrix[0]) - 2):
+                if MapBuilder.IsThereWrongWall(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_EMPTY
         # self.SetDoorWaysOnMap()
 
-    def IsThereFakeDoor(self, position):
-        if self.GetTile((position[0] - 1, position[1])) in [kPath]:
-            if self.GetTile((position[0] - 2, position[1])) in [kEmpty, kBoardOfMap]:
-                return (position[0] - 1, position[1])
-        if self.GetTile((position[0] + 1, position[1])) in [kPath]:
-            if self.GetTile((position[0] + 2, position[1])) in [kEmpty, kBoardOfMap]:
-                return (position[0] + 1, position[1])
-        if self.GetTile((position[0], position[1] + 1)) in [kPath]:
-            if self.GetTile((position[0], position[1] + 2)) in [kEmpty, kBoardOfMap]:
-                return (position[0], position[1] + 1)
-        if self.GetTile((position[0], position[1] - 1)) in [kPath]:
-            if self.GetTile((position[0], position[1] - 2)) in [kEmpty, kBoardOfMap]:
-                return (position[0], position[1] - 1)
+    @staticmethod
+    def IsThereFakeDoor(main_matrix, position):
+        if MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in [CHAR_FOR_PATH]:
+            if MapBuilder.GetTile(main_matrix, (position[0] - 2, position[1])) in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
+                return position[0] - 1, position[1]
+        if MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_PATH]:
+            if MapBuilder.GetTile(main_matrix, (position[0] + 2, position[1])) in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
+                return position[0] + 1, position[1]
+        if MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [CHAR_FOR_PATH]:
+            if MapBuilder.GetTile(main_matrix, (position[0], position[1] + 2)) in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
+                return position[0], position[1] + 1
+        if MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [CHAR_FOR_PATH]:
+            if MapBuilder.GetTile(main_matrix, (position[0], position[1] - 2)) in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
+                return position[0], position[1] - 1
         return False
 
-    def DeleteFakeDoors(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.GetTile((i, j)) in [kDoor]:
-                    interm = self.IsThereFakeDoor((i, j))
-                    if interm != False:
-                        self.main_matrix[i][j] = kUpWall
-                        self.main_matrix[interm[0]][interm[1]] = kEmpty
+    @staticmethod
+    def DeleteFakeDoors(main_matrix):
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR]:
+                    interm = MapBuilder.IsThereFakeDoor(main_matrix, (i, j))
+                    if interm is not False:
+                        main_matrix[i][j] = CHAR_FOR_UP_WALL
+                        main_matrix[interm[0]][interm[1]] = CHAR_FOR_EMPTY
 
-    def SetBoardsOfMap(self):
-        for i in range(len(self.main_matrix)):
-            self.main_matrix[i][0] = kBoardOfMap
-        for i in range(len(self.main_matrix[0])):
-            self.main_matrix[len(self.main_matrix) - 1][i] = kBoardOfMap
-        for i in range(len(self.main_matrix)):
-            self.main_matrix[i][len(self.main_matrix[0]) - 1] = kBoardOfMap
-        for i in range(len(self.main_matrix[0])):
-            self.main_matrix[0][i] = kBoardOfMap
+    @staticmethod
+    def SetBoardsOfMap(main_matrix):
+        for i in range(len(main_matrix)):
+            main_matrix[i][0] = CHAR_FOR_MAP_BOARD
+        for i in range(len(main_matrix[0])):
+            main_matrix[len(main_matrix) - 1][i] = CHAR_FOR_MAP_BOARD
+        for i in range(len(main_matrix)):
+            main_matrix[i][len(main_matrix[0]) - 1] = CHAR_FOR_MAP_BOARD
+        for i in range(len(main_matrix[0])):
+            main_matrix[0][i] = CHAR_FOR_MAP_BOARD
 
-    def DeleteCutCorners(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.IsThereCutCorner((i, j)):
-                    self.main_matrix[i][j] = kUpWall
+    @staticmethod
+    def DeleteCutCorners(main_matrix):
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.IsThereCutCorner(main_matrix, (i, j)):
+                    main_matrix[i][j] = CHAR_FOR_UP_WALL
 
-    def DeleteCutCornersAfterCreate(self, list_of_corners):
+    @staticmethod
+    def DeleteCutCornersAfterCreate(main_matrix, list_of_corners):
         for i in list_of_corners:
-            self.main_matrix[i[0]][i[1]] = kUpWall
+            main_matrix[i[0]][i[1]] = CHAR_FOR_UP_WALL
 
-    def MakeCutCorners(self, list_of_corners):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.IsThereCorner((i, j)):
+    @staticmethod
+    def MakeCutCorners(main_matrix, list_of_corners):
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.IsThereCorner(main_matrix, (i, j)):
                     list_of_corners.append((i, j))
-                    self.main_matrix[i][j] = kEmpty
+                    main_matrix[i][j] = CHAR_FOR_EMPTY
 
-    def SetPathsOnMap(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.main_matrix[i][j] == kEmpty:
-                    self.dfs.DFSForPaths((i, j))
-                    for k in self.dfs.GetPath():
-                        self.main_matrix[k[0]][k[1]] = kPath
-                    self.dfs.counter_for_doors = 1
-        self.dfs.Clear()
+    @staticmethod
+    def SetPathsOnMap(main_matrix):
+        dfs = DFSAlgoForMapBuilder()
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if main_matrix[i][j] == CHAR_FOR_EMPTY:
+                    dfs.DFSForPaths(main_matrix, (i, j))
+                    for k in dfs.GetPath():
+                        main_matrix[k[0]][k[1]] = CHAR_FOR_PATH
+                    dfs.counter_for_doors = 1
+        dfs.Clear()
 
-    def SetDoorWaysOnMap(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.GetTile((i, j)) in [kUpWall] and self.IsThereCorner((i, j)):
-                    self.dfs.DFSForCornersOfRoom((i, j))
-                    # return
-        for k in self.dfs.GetPath():
-            self.main_matrix[k[0]][k[1]] = kSign
-        self.dfs.Clear()
-
-    def SetDoorsBetweenRooms(self):
+    @staticmethod
+    def SetDoorsBetweenRooms(main_matrix):
         counter = 1
-        freq_of_door = random.randrange(kMinFreqOfDoor, kMaxFreqOfDoor)
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.IsThereDoorBetweenRooms((i, j)):
+        freq_of_door = random.randrange(MIN_FREQ_OF_DOOR, MAX_FREQ_OF_DOOR)
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.IsThereDoorBetweenRooms(main_matrix, (i, j)):
                     counter += 1
                     if counter % freq_of_door == 0:
-                        if self.GetTile((i + 1, j)) in kUpWall:
-                            self.main_matrix[i - 1][j] = kDoor
-                            self.main_matrix[i + 1][j] = kDoor
+                        if MapBuilder.GetTile(main_matrix, (i + 1, j)) in CHAR_FOR_UP_WALL:
+                            main_matrix[i - 1][j] = CHAR_FOR_DOOR
+                            main_matrix[i + 1][j] = CHAR_FOR_DOOR
                         else:
-                            self.main_matrix[i][j - 1] = kDoor
-                            self.main_matrix[i][j + 1] = kDoor
+                            main_matrix[i][j - 1] = CHAR_FOR_DOOR
+                            main_matrix[i][j + 1] = CHAR_FOR_DOOR
 
                         counter = 1
                         freq_of_door = random.randrange(
-                            kMinFreqOfDoor, kMaxFreqOfDoor)
+                            MIN_FREQ_OF_DOOR, MAX_FREQ_OF_DOOR)
 
-    def DeleteDoubleDoors(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.dfs.used.get((i, j)) is None:
-                    if self.GetTile((i, j)) in [kDoor] and self.GetTile((i - 1, j)) in [kDoor]:
-                        self.main_matrix[i - 1][j] = kUpWall
-                    if self.GetTile((i, j)) in [kDoor] and self.GetTile((i, j - 1)) in [kDoor]:
-                        self.main_matrix[i][j - 1] = kUpWall
+    @staticmethod
+    def DeleteDoubleDoors(main_matrix):
+        dfs = DFSAlgoForMapBuilder()
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if dfs.used.get((i, j)) is None:
+                    if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR] and MapBuilder.GetTile(main_matrix, (
+                            i - 1, j)) in [CHAR_FOR_DOOR]:
+                        main_matrix[i - 1][j] = CHAR_FOR_UP_WALL
+                    if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR] and MapBuilder.GetTile(main_matrix, (
+                            i, j - 1)) in [CHAR_FOR_DOOR]:
+                        main_matrix[i][j - 1] = CHAR_FOR_UP_WALL
 
-    def SetFloorInFrontOfDoor(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.GetTile((i, j)) in [kDoor]:
-                    if self.GetTile((i + 1, j)) in [kFloor]:
-                        self.main_matrix[i - 1][j] = kPath
-                    if self.GetTile((i - 1, j)) in [kFloor]:
-                        self.main_matrix[i + 1][j] = kPath
-                    if self.GetTile((i, j + 1)) in [kFloor]:
-                        self.main_matrix[i][j - 1] = kPath
-                    if self.GetTile((i, j - 1)) in [kFloor]:
-                        self.main_matrix[i][j + 1] = kPath
+    @staticmethod
+    def SetFloorInFrontOfDoor(main_matrix):
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR]:
+                    if MapBuilder.GetTile(main_matrix, (i + 1, j)) in [CHAR_FOR_FLOR]:
+                        main_matrix[i - 1][j] = CHAR_FOR_PATH
+                    if MapBuilder.GetTile(main_matrix, (i - 1, j)) in [CHAR_FOR_FLOR]:
+                        main_matrix[i + 1][j] = CHAR_FOR_PATH
+                    if MapBuilder.GetTile(main_matrix, (i, j + 1)) in [CHAR_FOR_FLOR]:
+                        main_matrix[i][j - 1] = CHAR_FOR_PATH
+                    if MapBuilder.GetTile(main_matrix, (i, j - 1)) in [CHAR_FOR_FLOR]:
+                        main_matrix[i][j + 1] = CHAR_FOR_PATH
 
-    def DeleteDeadEnds(self):
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.GetTile((i, j)) in [kPath] and self.IsThereAnyTile((i, j), [kDoor]):
-                    self.dfs.DFSForDeletingDeadEnds((i, j))
-        self.dfs.Clear()
+    @staticmethod
+    def DeleteDeadEnds(main_matrix):
+        dfs = DFSAlgoForMapBuilder()
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_PATH] and MapBuilder.IsThereAnyTile(main_matrix,
+                                                                                                            (i, j), [
+                                                                                                                CHAR_FOR_DOOR]):
+                    dfs.DFSForDeletingDeadEnds(main_matrix, (i, j))
+        dfs.Clear()
 
-    def ClearMatrix(self):
-        for i in range(len(self.main_matrix)):
-            for j in range(len(self.main_matrix[0])):
-                self.main_matrix[i][j] = kEmpty
+    @staticmethod
+    def ClearMatrix(main_matrix):
+        for i in range(len(main_matrix)):
+            for j in range(len(main_matrix[0])):
+                main_matrix[i][j] = CHAR_FOR_EMPTY
 
-    def DeleteNotConnectedComponents(self):
+    @staticmethod
+    def DeleteNotConnectedComponents(main_matrix):
         matrix = []
         sign = False
-        for i in range(1, len(self.main_matrix) - 1):
-            for j in range(1, len(self.main_matrix[0]) - 1):
-                if self.GetTile((i, j)) in [kDoor]:
-                    self.dfs.DFSOnTheSpecificTiles((i, j), matrix, kWalls + [kFloor, kDoor, kPath])
+        dfs = DFSAlgoForMapBuilder()
+        for i in range(1, len(main_matrix) - 1):
+            for j in range(1, len(main_matrix[0]) - 1):
+                if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR]:
+                    dfs.DFSOnTheSpecificTiles(main_matrix, (i, j), matrix,
+                                              SET_WITH_WALLS + [CHAR_FOR_FLOR, CHAR_FOR_DOOR, CHAR_FOR_PATH])
                     sign = True
                     break
             if sign:
                 break
 
-        self.ClearMatrix()
+        MapBuilder.ClearMatrix(main_matrix)
         for i in matrix:
-            self.main_matrix[i[0][0]][i[0][1]] = i[1]
+            main_matrix[i[0][0]][i[0][1]] = i[1]
 
 
-class DFSAlgo:
-    def __init__(self, matrix: MapGenerator):
+class DFSAlgoForMapBuilder:
+    def __init__(self):
         self.used = {}
         self.parents = {}
         self.path = []
-        self.map = matrix
         self.counter_for_doors = 1
-        self.freq_of_doors = random.randrange(kMinFreqOfDoor, kMaxFreqOfDoor)
+        self.freq_of_doors = random.randrange(MIN_FREQ_OF_DOOR, MAX_FREQ_OF_DOOR)
 
     def RandFreq(self):
-        self.freq_of_doors = random.randrange(kMinFreqOfDoor, kMaxFreqOfDoor)
+        self.freq_of_doors = random.randrange(MIN_FREQ_OF_DOOR, MAX_FREQ_OF_DOOR)
 
     def GetPath(self):
         return self.path
@@ -914,19 +971,18 @@ class DFSAlgo:
         self.used.clear()
         self.counter_for_doors = 1
 
-    def DFSForPaths(self, vertex):
-        test = self.map.GetAround(vertex)
+    def DFSForPaths(self, main_matrix, vertex):
         sign = False
-        for i in self.map.GetAround(vertex):
+        for i in MapBuilder.GetAround(main_matrix, vertex):
             for j in i:
                 if j not in [(-1, -1), vertex]:
                     if self.parents.get(vertex) is not None:
-                        if self.map.IsItWallForDoor(j):
+                        if MapBuilder.IsItWallForDoor(main_matrix, j):
                             if self.used.get((j[0], j[1] - 2)) is not None or self.used.get(
                                     (j[0], j[1] + 2)) is not None or self.used.get(
                                 (j[0] - 2, j[1])) is not None or self.used.get((j[0] + 2, j[1])) is not None:
                                 if self.parents.get(vertex)[0] == j[0] or self.parents.get(vertex)[1] == j[1]:
-                                    self.map.main_matrix[j[0]][j[1]] = kProbDoor
+                                    main_matrix[j[0]][j[1]] = CHAR_FOR_POTENTIAL_DOOR
                                     # if self.counter_for_doors % self.freq_of_doors == 0:
                                     #     self.counter_for_doors = 1
                                     #     self.RandFreq()
@@ -935,14 +991,14 @@ class DFSAlgo:
                     if j == self.parents.get(vertex):
                         continue
 
-                    if self.map.GetTile(j) not in [kEmpty, kBoardOfMap]:
+                    if MapBuilder.GetTile(main_matrix, j) not in [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]:
                         sign = True
                         continue
 
                     if self.used.get(j):
                         second_sign = False
-                        for i in self.map.GetAroundForDFS(vertex, self.parents[vertex]):
-                            if j in i:
+                        for line in MapBuilder.GetAroundForDFS(main_matrix, vertex, self.parents[vertex]):
+                            if j in line:
                                 second_sign = True
                                 break
                         if second_sign:
@@ -954,63 +1010,72 @@ class DFSAlgo:
         self.used[vertex] = True
         self.path.append(vertex)
 
-        neighbours = self.map.GetNeighbours(vertex).copy()
+        neighbours = MapBuilder.GetNeighbours(main_matrix, vertex).copy()
         while len(neighbours) != 0:
             i = random.choice(neighbours)
             neighbours.remove(i)
-            if self.used.get(i) is None and i != self.parents.get(vertex) and self.map.GetTile(i) not in [kBoardOfMap]:
+            if self.used.get(i) is None and i != self.parents.get(vertex) and MapBuilder.GetTile(main_matrix,
+                                                                                                 i) not in [
+                CHAR_FOR_MAP_BOARD]:
                 self.parents[i] = vertex
-                self.DFSForPaths(i)
+                self.DFSForPaths(main_matrix, i)
 
-    def DFSForDeletingDeadEnds(self, vertex):
+    def DFSForDeletingDeadEnds(self, main_matrix, vertex):
         self.used[vertex] = True
         self.path.append(vertex)
 
-        for i in self.map.GetNeighbours(vertex):
-            if self.used.get(i) is None and i != self.parents.get(vertex) and self.map.GetTile(i) in [kPath]:
+        for i in MapBuilder.GetNeighbours(main_matrix, vertex):
+            if self.used.get(i) is None and i != self.parents.get(vertex) and MapBuilder.GetTile(main_matrix, i) in [
+                CHAR_FOR_PATH]:
                 self.parents[i] = vertex
-                self.DFSForDeletingDeadEnds(i)
+                self.DFSForDeletingDeadEnds(main_matrix, i)
         if self.parents.get(vertex) is not None:
-            if self.map.IsThereDeadEnd(vertex, self.parents.get(vertex)):
-                self.map.main_matrix[vertex[0]][vertex[1]] = kEmpty
+            if MapBuilder.IsThereDeadEnd(main_matrix, vertex, self.parents.get(vertex)):
+                main_matrix[vertex[0]][vertex[1]] = CHAR_FOR_EMPTY
 
-    def DFSForSetDoors(self, vertex):
+    def DFSForSetDoors(self, main_matrix, vertex):
         if self.used.get(vertex) is not None:
             return
         self.used[vertex] = True
         if self.counter_for_doors < self.freq_of_doors:
             self.counter_for_doors += 1
         self.path.append(vertex)
-        if self.map.GetTile(vertex) in [kProbDoor] and self.counter_for_doors % self.freq_of_doors == 0:
-            # if self.map.GetTile(vertex) in [kProbDoor]:
-            self.map.main_matrix[vertex[0]][vertex[1]] = kDoor
+        if MapBuilder.GetTile(main_matrix, vertex) in [
+            CHAR_FOR_POTENTIAL_DOOR] and self.counter_for_doors % self.freq_of_doors == 0:
+            # if MapBuilder.GetTile(vertex) in [kProbDoor]:
+            main_matrix[vertex[0]][vertex[1]] = CHAR_FOR_DOOR
             self.RandFreq()
             self.counter_for_doors = 0
-        for i in self.map.GetNeighbours(vertex):
-            if self.used.get(i) is None and i != self.parents.get(vertex) and self.map.GetTile(i) in [kProbDoor, kDoor,
-                                                                                                      kUpWall]:
+        for i in MapBuilder.GetNeighbours(main_matrix, vertex):
+            if self.used.get(i) is None and i != self.parents.get(vertex) and MapBuilder.GetTile(main_matrix, i) in [
+                CHAR_FOR_POTENTIAL_DOOR, CHAR_FOR_DOOR,
+                CHAR_FOR_UP_WALL]:
                 self.parents[i] = vertex
-                self.DFSForSetDoors(i)
+                self.DFSForSetDoors(main_matrix, i)
 
-    def RecursiveDFSOnTheSpecific(self, vertex, final_matrix, tiles, current_depth, flag=None, keys=None, depth=100000):
+    def RecursiveDFSOnTheSpecific(self, main_matrix, vertex, final_matrix, tiles, current_depth, flag=None, keys=None,
+                                  depth=100000):
         self.used[vertex] = True
         self.path.append(vertex)
-        final_matrix.append((vertex, self.map.GetTile(vertex)))
-        if current_depth > depth:
+        final_matrix.append((vertex, MapBuilder.GetTile(main_matrix, vertex)))
+        if current_depth >= depth:
             return
-        for i in self.map.GetNeighbours(vertex):
-            if self.map.GetTile(i) in tiles:
+        for i in MapBuilder.GetNeighbours(main_matrix, vertex):
+            if MapBuilder.GetTile(main_matrix, i) in tiles:
                 if flag == 'path':
-                    if self.map.GetTile(i) in [kDoor] and self.map.GetTile(vertex) in [kPath]:
+                    if MapBuilder.GetTile(main_matrix, i) in [CHAR_FOR_DOOR] and MapBuilder.GetTile(
+                            main_matrix, vertex) in [CHAR_FOR_PATH]:
                         keys.append(vertex)
                 if flag == 'room':
-                    if self.map.GetTile(i) in [kDoor]:
+                    if MapBuilder.GetTile(main_matrix, i) in [CHAR_FOR_DOOR]:
                         keys.append(i)
                 if self.used.get(i) is None and i != self.parents.get(vertex):
                     self.parents[i] = vertex
-                    self.RecursiveDFSOnTheSpecific(i, final_matrix, tiles, current_depth=current_depth + 1, flag=flag,
+                    self.RecursiveDFSOnTheSpecific(main_matrix, i, final_matrix, tiles, current_depth=current_depth + 1,
+                                                   flag=flag,
                                                    keys=keys, depth=depth)
 
-    def DFSOnTheSpecificTiles(self, vertex, final_matrix, tiles, keys=None, flag=None, depth=1000000):
+    def DFSOnTheSpecificTiles(self, main_matrix, vertex, final_matrix, tiles, keys=None, flag=None, depth=1000000):
         self.Clear()
-        self.RecursiveDFSOnTheSpecific(vertex, final_matrix, tiles, keys=keys, current_depth=0, flag=flag, depth=depth)
+        self.RecursiveDFSOnTheSpecific(main_matrix, vertex, final_matrix, tiles, keys=keys, current_depth=0, flag=flag,
+                                       depth=depth)

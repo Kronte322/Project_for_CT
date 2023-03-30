@@ -26,7 +26,7 @@ image_for_zoo = pygame.image.load("../tile_sets/tiles_for_map/back_ground/sprite
 image_for_zoo = pygame.transform.scale(image_for_zoo, (kSizeOfDisplay[0], kSizeOfDisplay[1]))
 image_for_zoom.blit(image_for_zoo, (0, 0))
 
-# mappa.SpawnPosition()
+mappa.SpawnPosition()
 
 
 class Player:
@@ -52,32 +52,32 @@ class Player:
     def move(self):
         key = pygame.key.get_pressed()
         if key[pygame.K_w]:
-            # if mappa.CanStandThere(
-            #         (
-            #                 self.rect.x,
-            #                 self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
-            #     if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
-            #                             self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
-            #         self.rect.y -= self.kSpeed
-            self.rect.y -= self.kSpeed
+            if mappa.CanStandThere(
+                    (
+                            self.rect.x,
+                            self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
+                if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
+                                        self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
+                    self.rect.y -= self.kSpeed
+            # self.rect.y -= self.kSpeed
         if key[pygame.K_a]:
-            # if mappa.CanStandThere(
-            #         (self.rect.x - self.kSpeed, self.rect.y + kSizeOfCharacter)):
-            #     self.rect.x -= self.kSpeed
-            self.rect.x -= self.kSpeed
+            if mappa.CanStandThere(
+                    (self.rect.x - self.kSpeed, self.rect.y + kSizeOfCharacter)):
+                self.rect.x -= self.kSpeed
+            # self.rect.x -= self.kSpeed
         if key[pygame.K_s]:
-            # if mappa.CanStandThere(
-            #         (self.rect.x, self.rect.y + kSizeOfCharacter + self.kSpeed)):
-            #     if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
-            #                             self.rect.y + kSizeOfCharacter + self.kSpeed)):
-            #         self.rect.y += self.kSpeed
-            self.rect.y += self.kSpeed
+            if mappa.CanStandThere(
+                    (self.rect.x, self.rect.y + kSizeOfCharacter + self.kSpeed)):
+                if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
+                                        self.rect.y + kSizeOfCharacter + self.kSpeed)):
+                    self.rect.y += self.kSpeed
+            # self.rect.y += self.kSpeed
         if key[pygame.K_d]:
-            # if mappa.CanStandThere(
-            #         (self.rect.x + kSizeOfCharacter + self.kSpeed,
-            #          self.rect.y + kSizeOfCharacter)):
-            #     self.rect.x += self.kSpeed
-            self.rect.x += self.kSpeed
+            if mappa.CanStandThere(
+                    (self.rect.x + kSizeOfCharacter + self.kSpeed,
+                     self.rect.y + kSizeOfCharacter)):
+                self.rect.x += self.kSpeed
+            # self.rect.x += self.kSpeed
         if player.rect.x <= self.moveBox[0]:
             self.rect.x += self.kSpeed
             mappa.MoveMap([self.kSpeed, 0])
@@ -108,7 +108,7 @@ while RUNNING:
 
     display.fill((37, 19, 26))
 
-    # mappa.SetCurrentRoom([player.rect.x + kSizeOfCharacter // 2, player.rect.y + kSizeOfCharacter])
+    mappa.SetCurrentRoom([player.rect.x + kSizeOfCharacter // 2, player.rect.y + kSizeOfCharacter])
     mappa.Render(display)
 
     player.render(display)

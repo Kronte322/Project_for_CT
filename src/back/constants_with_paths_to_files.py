@@ -1,0 +1,13 @@
+
+PATH_TO_DOOR_IMG = "../tile_sets/tiles_for_map/doors/sprite_066.png"
+PATH_TO_EMPTY_IMG = "../tile_sets/tiles_for_map/back_ground/sprite_078.png"
+PATH_TO_LEFT_DOWN_IN_CORNER = "../tile_sets/tiles_for_map/left_down_corner/in_corner.png"
+PATH_TO_LEFT_DOWN_OUT_CORNER = "../tile_sets/tiles_for_map/left_down_corner/out_corner.png"
+PATH_TO_RIGHT_DOWN_IN_CORNER = "../tile_sets/tiles_for_map/right_down_corner/in_corner.png"
+PATH_TO_RIGHT_DOWN_OUT_CORNER = "../tile_sets/tiles_for_map/right_down_corner/out_corner.png"
+PATH_TO_UP_WALLS = "../tile_sets/tiles_for_map/up_walls/sprite_"
+PATH_TO_DOWN_WALLS = "../tile_sets/tiles_for_map/down_walls/sprite_"
+PATH_TO_RIGHT_WALLS = "../tile_sets/tiles_for_map/right_walls/sprite_"
+PATH_TO_LEFT_WALLS = "../tile_sets/tiles_for_map/left_walls/sprite_"
+PATH_TO_FLOORS = "../tile_sets/tiles_for_map/floor/sprite_"
+EXTENSION_OF_IMG_FILES = ".png"
