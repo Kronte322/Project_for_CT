@@ -3,19 +3,18 @@ import sys
 import pygame
 from src.back import class_map
 from src.back import map_generator
+from src.back.constants_for_map import *
 import math
 
 sys.setrecursionlimit(10000000)
 mappa = class_map.Map()
 pygame.init()
 
-kSizeOfDisplay = [1920, 1000]
+kSizeOfDisplay = WINDOW_SIZE
 
 display = pygame.display.set_mode((kSizeOfDisplay[0], kSizeOfDisplay[1]))
 
 clock = pygame.time.Clock()
-
-kSizeOfMoveBox = [600, 300]
 
 kSizeOfCharacter = 48
 kFramesPerSec = 60
@@ -45,9 +44,9 @@ class Player:
         # self.rect = pygame.Rect(
         #     (0, 0), (kSizeOfCharacter, kSizeOfCharacter))
 
-        self.moveBox = (kSizeOfDisplay[0] // 2 - kSizeOfMoveBox[0] // 2, kSizeOfDisplay[1] // 2 - kSizeOfMoveBox[1] //
-                        2, kSizeOfDisplay[0] // 2 + kSizeOfMoveBox[0] // 2,
-                        kSizeOfDisplay[1] // 2 + kSizeOfMoveBox[1] // 2)
+        self.moveBox = (kSizeOfDisplay[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, kSizeOfDisplay[1] // 2 - SIZE_OF_MOVE_BOX[1] //
+                        2, kSizeOfDisplay[0] // 2 + SIZE_OF_MOVE_BOX[0] // 2,
+                        kSizeOfDisplay[1] // 2 + SIZE_OF_MOVE_BOX[1] // 2)
 
     def move(self):
         key = pygame.key.get_pressed()
@@ -59,11 +58,14 @@ class Player:
                 if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
                                         self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
                     self.rect.y -= self.kSpeed
+                    mappa.MoveMiniMap([0, self.kSpeed])
             # self.rect.y -= self.kSpeed
         if key[pygame.K_a]:
             if mappa.CanStandThere(
                     (self.rect.x - self.kSpeed, self.rect.y + kSizeOfCharacter)):
                 self.rect.x -= self.kSpeed
+                mappa.MoveMiniMap([self.kSpeed, 0])
+
             # self.rect.x -= self.kSpeed
         if key[pygame.K_s]:
             if mappa.CanStandThere(
@@ -71,12 +73,16 @@ class Player:
                 if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
                                         self.rect.y + kSizeOfCharacter + self.kSpeed)):
                     self.rect.y += self.kSpeed
+                    mappa.MoveMiniMap([0, -self.kSpeed])
+
             # self.rect.y += self.kSpeed
         if key[pygame.K_d]:
             if mappa.CanStandThere(
                     (self.rect.x + kSizeOfCharacter + self.kSpeed,
                      self.rect.y + kSizeOfCharacter)):
                 self.rect.x += self.kSpeed
+                mappa.MoveMiniMap([-self.kSpeed, 0])
+
             # self.rect.x += self.kSpeed
         if player.rect.x <= self.moveBox[0]:
             self.rect.x += self.kSpeed

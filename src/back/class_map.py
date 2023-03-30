@@ -17,36 +17,28 @@ list_with_right_walls = []
 list_with_floor = []
 
 image_for_door = pygame.image.load(PATH_TO_DOOR_IMG)
-image_for_door = pygame.transform.scale(
-    image_for_door, (SIZE_OF_TILE, SIZE_OF_TILE))
 
 image_for_empty = pygame.image.load(PATH_TO_EMPTY_IMG)
-image_for_empty = pygame.transform.scale(
-    image_for_empty, (SIZE_OF_TILE, SIZE_OF_TILE))
 
 image_for_left_down_in_corner = pygame.image.load(PATH_TO_LEFT_DOWN_IN_CORNER)
-image_for_left_down_in_corner = pygame.transform.scale(
-    image_for_left_down_in_corner, (SIZE_OF_TILE, SIZE_OF_TILE))
 
 image_for_left_down_out_corner = pygame.image.load(PATH_TO_LEFT_DOWN_OUT_CORNER)
-image_for_left_down_out_corner = pygame.transform.scale(
-    image_for_left_down_out_corner, (SIZE_OF_TILE, SIZE_OF_TILE))
 
 image_for_right_down_in_corner = pygame.image.load(PATH_TO_RIGHT_DOWN_IN_CORNER)
-image_for_right_down_in_corner = pygame.transform.scale(
-    image_for_right_down_in_corner, (SIZE_OF_TILE, SIZE_OF_TILE))
 
 image_for_right_down_out_corner = pygame.image.load(PATH_TO_RIGHT_DOWN_OUT_CORNER)
-image_for_right_down_out_corner = pygame.transform.scale(
-    image_for_right_down_out_corner, (SIZE_OF_TILE, SIZE_OF_TILE))
 
-genered_floor = {}
+generated_floor = {}
 
 
-def SetImage(path, number, size=SIZE_OF_TILE):
+def SetImage(path, number, size_of_tile=SIZE_OF_TILE):
     result = pygame.image.load(path + str(number) + EXTENSION_OF_IMG_FILES)
-    result = pygame.transform.scale(result, (SIZE_OF_TILE, SIZE_OF_TILE))
     return result
+
+
+def ScaleImage(image, size_of_tile=SIZE_OF_TILE):
+    image = pygame.transform.scale(image, (size_of_tile, size_of_tile))
+    return image
 
 
 def SetTiles():
@@ -54,10 +46,13 @@ def SetTiles():
         list_with_up_walls.append(SetImage(PATH_TO_UP_WALLS, i))
     for i in range(1, NUM_OF_DOWN_WALLS + 1):
         list_with_down_walls.append(SetImage(PATH_TO_DOWN_WALLS, i))
+
     for i in range(1, NUM_OF_RIGHT_WALLS + 1):
         list_with_right_walls.append(SetImage(PATH_TO_RIGHT_WALLS, i))
+
     for i in range(1, NUM_OF_LEFT_WALLS + 1):
         list_with_left_walls.append(SetImage(PATH_TO_LEFT_WALLS, i))
+
     for i in range(1, NUM_OF_FLOORS + 1):
         list_with_floor.append(SetImage(PATH_TO_FLOORS, i))
 
@@ -68,6 +63,9 @@ class Map:
         self.matrix_with_map = MapBuilder.GenerateMap(SIZE_OF_MAP)
 
         self.mappa = pygame.Surface((SIZE_OF_MAP[0] * SIZE_OF_TILE, SIZE_OF_MAP[1] * SIZE_OF_TILE))
+        self.map_for_minimap = pygame.Surface(
+            (SIZE_OF_MAP[0] * SIZE_OF_TILE_ON_MINI_MAP, SIZE_OF_MAP[1] * SIZE_OF_TILE_ON_MINI_MAP))
+        self.mini_map = pygame.Surface(SIZE_OF_MINI_MAP)
 
         self.dfs = DFSAlgoForMapBuilder()
 
@@ -81,8 +79,73 @@ class Map:
 
         self.global_map_position = [0, 0]
         self.current_room_position = [0, 0]
+        self.mini_map_position = [0, 0]
 
         self.Blit(self.mappa, self.matrix_with_map, (0, 0))
+
+    @staticmethod
+    def BlitTileOnMap(surface, position_for_blit, tile, size_of_tile=SIZE_OF_TILE):
+        if tile == CHAR_FOR_DOOR:
+            surface.blit(ScaleImage(image_for_door, size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_UP_WALL:
+            surface.blit(ScaleImage(random.choice(list_with_up_walls), size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_DOWN_WALL:
+            surface.blit(ScaleImage(random.choice(list_with_down_walls), size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_RIGHT_WALL:
+            surface.blit(ScaleImage(random.choice(list_with_right_walls), size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_LEFT_WALL:
+            surface.blit(ScaleImage(random.choice(list_with_left_walls), size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_LEFT_DOWN_IN_CORNER:
+            surface.blit(ScaleImage(image_for_left_down_in_corner, size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_LEFT_DOWN_OUT_CORNER:
+            surface.blit(ScaleImage(image_for_left_down_out_corner, size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_RIGHT_DOWN_IN_CORNER:
+            surface.blit(ScaleImage(image_for_right_down_in_corner, size_of_tile), position_for_blit)
+        elif tile == CHAR_FOR_DOWN_OUT_CORNER:
+            surface.blit(ScaleImage(image_for_right_down_out_corner, size_of_tile), position_for_blit)
+        else:
+            surface.blit(ScaleImage(image_for_empty, size_of_tile), position_for_blit)
+
+    @staticmethod
+    def SetTilesOnMap(surface, matrix, left_corner):
+        """blit map according to the matrix and position of left corner relative to left corner of the main matrix"""
+
+        x, y = 0, 0
+        for i in range(len(matrix)):
+            for j in range(len(matrix[i])):
+                if matrix[i][j] in [CHAR_FOR_PATH]:
+                    if (i + left_corner[0], j + left_corner[1]) in generated_floor:
+                        surface.blit(generated_floor[(i + left_corner[0], j + left_corner[1])], (x, y))
+                    else:
+                        generated_floor[(i + left_corner[0], j + left_corner[1])] = random.choice(list_with_floor)
+                        surface.blit(generated_floor[(i + left_corner[0], j + left_corner[1])], (x, y))
+                else:
+                    surface.blit(ScaleImage(image_for_empty), (x, y))
+                y += SIZE_OF_TILE
+            x += SIZE_OF_TILE
+            y = 0
+
+    @staticmethod
+    def SetSpecificOnMatrix(matrix, list_of_tiles):
+        """set tiles on matrix according to following list"""
+
+        for tile in list_of_tiles:
+            matrix[tile[0][0]][tile[0][1]] = tile[1]
+
+    @staticmethod
+    def BlitSpecificOnMap(surface, list_of_tiles, size_of_tile=SIZE_OF_TILE):
+        """blit tiles on map according to following list"""
+
+        for tile in list_of_tiles:
+            x_coord = size_of_tile * tile[0][0]
+            y_coord = size_of_tile * tile[0][1]
+            if tile[1] in [CHAR_FOR_PATH, CHAR_FOR_FLOOR]:
+                if tile[0] not in generated_floor:
+                    generated_floor[tile[0]] = random.choice(list_with_floor)
+
+                surface.blit(ScaleImage(generated_floor[tile[0]], size_of_tile), (x_coord, y_coord))
+            else:
+                Map.BlitTileOnMap(surface, (x_coord, y_coord), tile[1], size_of_tile)
 
     def BlitMap(self, list_with_map):
         left_upper_corner = (
@@ -108,38 +171,21 @@ class Map:
         return left_upper_corner
 
     @staticmethod
-    def Blit(surface, matrix, left_corner):
+    def Blit(surface, matrix, left_corner, size_of_tile=SIZE_OF_TILE, mini_map=False):
         x, y = 0, 0
         for i in range(len(matrix)):
             for j in range(len(matrix[i])):
-                if matrix[i][j] in [CHAR_FOR_FLOR, CHAR_FOR_PATH]:
-                    if (i + left_corner[0], j + left_corner[1]) in genered_floor:
-                        surface.blit(genered_floor[(i + left_corner[0], j + left_corner[1])], (x, y))
-                    else:
-                        genered_floor[(i + left_corner[0], j + left_corner[1])] = random.choice(list_with_floor)
-                        surface.blit(genered_floor[(i + left_corner[0], j + left_corner[1])], (x, y))
-                elif matrix[i][j] == CHAR_FOR_DOOR:
-                    surface.blit(image_for_door, (x, y))
-                elif matrix[i][j] == CHAR_FOR_UP_WALL:
-                    surface.blit(random.choice(list_with_up_walls), (x, y))
-                elif matrix[i][j] == CHAR_FOR_DOWN_WALL:
-                    surface.blit(random.choice(list_with_down_walls), (x, y))
-                elif matrix[i][j] == CHAR_FOR_RIGHT_WALL:
-                    surface.blit(random.choice(list_with_right_walls), (x, y))
-                elif matrix[i][j] == CHAR_FOR_LEFT_WALL:
-                    surface.blit(random.choice(list_with_left_walls), (x, y))
-                elif matrix[i][j] == CHAR_FOR_LEFT_DOWN_IN_CORNER:
-                    surface.blit(image_for_left_down_in_corner, (x, y))
-                elif matrix[i][j] == CHAR_FOR_LEFT_DOWN_OUT_CORNER:
-                    surface.blit(image_for_left_down_out_corner, (x, y))
-                elif matrix[i][j] == CHAR_FOR_RIGHT_DOWN_IN_CORNER:
-                    surface.blit(image_for_right_down_in_corner, (x, y))
-                elif matrix[i][j] == CHAR_FOR_DOWN_OUT_CORNER:
-                    surface.blit(image_for_right_down_out_corner, (x, y))
+                if matrix[i][j] in [CHAR_FOR_FLOOR, CHAR_FOR_PATH]:
+                    if (i + left_corner[0], j + left_corner[1]) not in generated_floor:
+                        generated_floor[(i + left_corner[0], j + left_corner[1])] = random.choice(list_with_floor)
+
+                    surface.blit(
+                        ScaleImage(generated_floor[(i + left_corner[0], j + left_corner[1])], size_of_tile),
+                        (x, y))
                 else:
-                    surface.blit(image_for_empty, (x, y))
-                y += SIZE_OF_TILE
-            x += SIZE_OF_TILE
+                    Map.BlitTileOnMap(surface, (x, y), matrix[i][j], size_of_tile)
+                y += size_of_tile
+            x += size_of_tile
             y = 0
 
     def GetTile(self, position):
@@ -151,7 +197,7 @@ class Map:
 
     def CanStandThere(self, position):
         tile = self.GetTile((position[0] - self.global_map_position[0], position[1] - self.global_map_position[1]))
-        return tile in [CHAR_FOR_FLOR, CHAR_FOR_DOOR, CHAR_FOR_PATH]
+        return tile in [CHAR_FOR_FLOOR, CHAR_FOR_DOOR, CHAR_FOR_PATH]
 
     def SetCurrentRoom(self, player_position, flag=False):
         if not flag:
@@ -171,12 +217,12 @@ class Map:
                     self.tiles_for_current_room[
                         (self.GetPositionOfTile(player_position), self.GetTile(player_position))] = True
                 elif MapBuilder.GetTile(self.matrix_with_map, self.GetPositionOfTile(player_position)) in [
-                    CHAR_FOR_FLOR,
+                    CHAR_FOR_FLOOR,
                     CHAR_FOR_DOOR]:
                     self.dfs.DFSOnTheSpecificTiles(self.matrix_with_map, self.GetPositionOfTile(player_position),
                                                    current_room,
                                                    SET_WITH_WALLS + [CHAR_FOR_DOOR,
-                                                                     CHAR_FOR_FLOR],
+                                                                     CHAR_FOR_FLOOR],
                                                    keys=keys, flag='room')
                     for i in current_room:
                         self.tiles_for_current_room[i] = True
@@ -184,6 +230,7 @@ class Map:
                         self.visited_tiles.keys()):
                     for i in current_room:
                         self.visited_tiles[i] = True
+                self.BlitSpecificOnMap(self.map_for_minimap, current_room, SIZE_OF_TILE_ON_MINI_MAP)
                 left_upper_corner = self.BlitMap(current_room)
                 copy = [self.current_room.copy(), left_upper_corner, self.tiles_for_current_room.copy()]
                 for i in keys:
@@ -204,6 +251,12 @@ class Map:
     def Render(self, display):
         # display.blit(self.mappa, self.global_map_position)
         display.blit(self.current_room, self.current_room_position)
+        self.mini_map.blit(self.map_for_minimap, self.mini_map_position)
+        display.blit(self.mini_map, POSITION_OF_MINI_MAP)
+
+    def MoveMiniMap(self, position):
+        self.mini_map_position[0] += position[0] * SIZE_OF_TILE_ON_MINI_MAP / SIZE_OF_TILE
+        self.mini_map_position[1] += position[1] * SIZE_OF_TILE_ON_MINI_MAP / SIZE_OF_TILE
 
     def MoveMap(self, position):
         self.global_map_position[0] += position[0]
@@ -215,7 +268,10 @@ class Map:
         while True:
             x = random.randrange(1, SIZE_OF_MAP[0])
             y = random.randrange(1, SIZE_OF_MAP[1])
-            if self.matrix_with_map[x][y] in [CHAR_FOR_FLOR]:
-                self.global_map_position = [-x * SIZE_OF_TILE + SPAWN_POSITION[0], -y * SIZE_OF_TILE + SPAWN_POSITION[1]]
+            if self.matrix_with_map[x][y] in [CHAR_FOR_FLOOR]:
+                self.global_map_position = [-x * SIZE_OF_TILE + SPAWN_POSITION[0],
+                                            -y * SIZE_OF_TILE + SPAWN_POSITION[1]]
+                self.mini_map_position = [-x * SIZE_OF_TILE_ON_MINI_MAP + SIZE_OF_MINI_MAP[0] // 2,
+                                          -y * SIZE_OF_TILE_ON_MINI_MAP + SIZE_OF_MINI_MAP[1] // 2]
                 self.SetCurrentRoom((x * SIZE_OF_TILE, y * SIZE_OF_TILE), flag=True)
                 return None

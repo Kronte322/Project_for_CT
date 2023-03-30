@@ -2,8 +2,8 @@ import random
 import time
 from src.back.constants_for_map import *
 
-# random.seed(time.time())
-random.seed(12)
+random.seed(time.time())
+# random.seed(12)
 
 
 class MapBuilder:
@@ -30,11 +30,11 @@ class MapBuilder:
                 (position[0], position[1] - 1)) in [CHAR_FOR_UP_WALL, CHAR_FOR_DOOR]:
                 if MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in [
                     CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix,
-                                                           (position[0] + 1, position[1])) in [CHAR_FOR_FLOR]:
+                                                           (position[0] + 1, position[1])) in [CHAR_FOR_FLOOR]:
                     return True
                 if MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in [
-                    CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix,
-                                                          (position[0] + 1, position[1])) in [CHAR_FOR_EMPTY]:
+                    CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix,
+                                                           (position[0] + 1, position[1])) in [CHAR_FOR_EMPTY]:
                     return True
             if MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_UP_WALL,
                                                                                    CHAR_FOR_DOOR] and MapBuilder.GetTile(
@@ -42,11 +42,11 @@ class MapBuilder:
                 (position[0] - 1, position[1])) in [CHAR_FOR_UP_WALL, CHAR_FOR_DOOR]:
                 if MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
                     CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix,
-                                                           (position[0], position[1] + 1)) in [CHAR_FOR_FLOR]:
+                                                           (position[0], position[1] + 1)) in [CHAR_FOR_FLOOR]:
                     return True
                 if MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
-                    CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix,
-                                                          (position[0], position[1] + 1)) in [CHAR_FOR_EMPTY]:
+                    CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix,
+                                                           (position[0], position[1] + 1)) in [CHAR_FOR_EMPTY]:
                     return True
         return False
 
@@ -78,22 +78,22 @@ class MapBuilder:
     @staticmethod
     def IsThereCutCorner(main_matrix, position: tuple):
         if MapBuilder.IsThereAnyTile(main_matrix, position, [CHAR_FOR_EMPTY]):
-            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix, (
                     position[0] - 1, position[1])) in [
                 CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
                 CHAR_FOR_UP_WALL]:
                 return True
-            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix, (
                     position[0] - 1, position[1])) in [
                 CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
                 CHAR_FOR_UP_WALL]:
                 return True
-            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix, (
                     position[0] + 1, position[1])) in [
                 CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
                 CHAR_FOR_UP_WALL]:
                 return True
-            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (
+            if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix, (
                     position[0] + 1, position[1])) in [
                 CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] - 1)) in [
                 CHAR_FOR_UP_WALL]:
@@ -102,7 +102,7 @@ class MapBuilder:
 
     @staticmethod
     def IsThereCutCornerAfterCreate(main_matrix, position: tuple):
-        if MapBuilder.IsThereAnyTile(main_matrix, position, [CHAR_FOR_FLOR]):
+        if MapBuilder.IsThereAnyTile(main_matrix, position, [CHAR_FOR_FLOOR]):
             if MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_EMPTY] and MapBuilder.GetTile(main_matrix, (
                     position[0] - 1, position[1])) in [
                 CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [
@@ -230,8 +230,6 @@ class MapBuilder:
             res.append(interm)
         return res
 
-    # def IsAbleToMove(self, position):
-
     @staticmethod
     def GetAroundForDFS(main_matrix, position, parent):
         if position[0] > parent[0]:
@@ -303,7 +301,7 @@ class MapBuilder:
             for i in range(right_down_corner[0]):
                 interm_array = []
                 for j in range(right_down_corner[1]):
-                    interm_array.append(CHAR_FOR_FLOR)
+                    interm_array.append(CHAR_FOR_FLOOR)
                 interm.append(interm_array)
             MapBuilder.basic_rooms.append(interm)
 
@@ -392,7 +390,7 @@ class MapBuilder:
                                             i][left_corner_position[1] + j] = CHAR_FOR_UP_WALL
                             else:
                                 main_matrix[left_corner_position[0] +
-                                            i][left_corner_position[1] + j] = CHAR_FOR_FLOR
+                                            i][left_corner_position[1] + j] = CHAR_FOR_FLOOR
 
     @staticmethod
     def GenerateMapWithColumns(main_matrix):
@@ -418,7 +416,7 @@ class MapBuilder:
 
                 counter += 1
                 if not MapBuilder.IsThereIntersec(main_matrix, column, left_corner_position,
-                                                  list_of_tiles=[CHAR_FOR_FLOR]):
+                                                  list_of_tiles=[CHAR_FOR_FLOOR]):
                     width_of_column -= 2
                     height_of_column -= 2
                     x_coord += 2
@@ -499,28 +497,28 @@ class MapBuilder:
                             main_matrix, (left_corner_position[0] + i, left_corner_position[1] + j),
                             [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]):
                             main_matrix[left_corner_position[0] +
-                                        i][left_corner_position[1] + j] = CHAR_FOR_FLOR
+                                        i][left_corner_position[1] + j] = CHAR_FOR_FLOOR
                     else:
                         main_matrix[left_corner_position[0] +
-                                    i][left_corner_position[1] + j] = CHAR_FOR_FLOR
+                                    i][left_corner_position[1] + j] = CHAR_FOR_FLOOR
 
     @staticmethod
     def IsThereAllFloors(main_matrix, position):
         counter = 0
         if position[0] > 0:
-            if main_matrix[position[0] - 1][position[1]] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
+            if main_matrix[position[0] - 1][position[1]] in [CHAR_FOR_FLOOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
         if position[0] < len(main_matrix[0]) - 1:
-            if main_matrix[position[0] + 1][position[1]] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
+            if main_matrix[position[0] + 1][position[1]] in [CHAR_FOR_FLOOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
         if position[1] > 0:
-            if main_matrix[position[0]][position[1] - 1] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
+            if main_matrix[position[0]][position[1] - 1] in [CHAR_FOR_FLOOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
         if position[1] < len(main_matrix) - 1:
-            if main_matrix[position[0]][position[1] + 1] in [CHAR_FOR_FLOR, CHAR_FOR_UP_WALL]:
+            if main_matrix[position[0]][position[1] + 1] in [CHAR_FOR_FLOOR, CHAR_FOR_UP_WALL]:
                 counter += 1
 
         if counter > 2:
@@ -531,14 +529,14 @@ class MapBuilder:
     def DeleteWallsOnDiagonal(main_matrix):
         for i in range(len(main_matrix) - 1):
             for j in range(len(main_matrix[0]) - 1):
-                if main_matrix[i][j] == CHAR_FOR_UP_WALL and main_matrix[i + 1][j] == CHAR_FOR_FLOR and \
+                if main_matrix[i][j] == CHAR_FOR_UP_WALL and main_matrix[i + 1][j] == CHAR_FOR_FLOOR and \
                         main_matrix[i][
-                            j + 1] == CHAR_FOR_FLOR and main_matrix[i + 1][j + 1] == CHAR_FOR_UP_WALL:
+                            j + 1] == CHAR_FOR_FLOOR and main_matrix[i + 1][j + 1] == CHAR_FOR_UP_WALL:
                     main_matrix[i + 1][j] = CHAR_FOR_UP_WALL
                     main_matrix[i][j + 1] = CHAR_FOR_UP_WALL
-                elif main_matrix[i][j] == CHAR_FOR_FLOR and main_matrix[i + 1][j] == CHAR_FOR_UP_WALL and \
+                elif main_matrix[i][j] == CHAR_FOR_FLOOR and main_matrix[i + 1][j] == CHAR_FOR_UP_WALL and \
                         main_matrix[i][
-                            j + 1] == CHAR_FOR_UP_WALL and main_matrix[i + 1][j + 1] == CHAR_FOR_FLOR:
+                            j + 1] == CHAR_FOR_UP_WALL and main_matrix[i + 1][j + 1] == CHAR_FOR_FLOOR:
                     main_matrix[i][j] = CHAR_FOR_UP_WALL
                     main_matrix[i + 1][j + 1] = CHAR_FOR_UP_WALL
 
@@ -549,7 +547,7 @@ class MapBuilder:
                 if main_matrix[i][j] == CHAR_FOR_UP_WALL:
                     if MapBuilder.IsThereAllFloors(main_matrix, (i, j)) and not MapBuilder.IsInCrossAnyTile(
                             main_matrix, (i, j), [CHAR_FOR_EMPTY, CHAR_FOR_MAP_BOARD]):
-                        main_matrix[i][j] = CHAR_FOR_FLOR
+                        main_matrix[i][j] = CHAR_FOR_FLOOR
 
     @staticmethod
     def IsThereDoorBetweenRooms(main_matrix, position: tuple):
@@ -606,7 +604,7 @@ class MapBuilder:
         counter_for_empty = 0
         for i in range(3):
             for j in range(3):
-                if main_matrix[position[0] + i][position[1] + j] in [CHAR_FOR_FLOR]:
+                if main_matrix[position[0] + i][position[1] + j] in [CHAR_FOR_FLOOR]:
                     counter_for_floors += 1
                 elif main_matrix[position[0] + i][position[1] + j] in [CHAR_FOR_UP_WALL]:
                     counter_for_walls += 1
@@ -620,7 +618,7 @@ class MapBuilder:
                 for j in range(3):
                     if MapBuilder.GetTile(main_matrix, (position[0] + i, position[1] + j)) in [CHAR_FOR_EMPTY]:
                         if MapBuilder.IsThereAnyTile(main_matrix, (position[0] + i, position[1] + j),
-                                                     tiles=[CHAR_FOR_FLOR]):
+                                                     tiles=[CHAR_FOR_FLOOR]):
                             main_matrix[position[0] + i][position[1] + j] = CHAR_FOR_UP_WALL
 
     @staticmethod
@@ -639,9 +637,9 @@ class MapBuilder:
     def IsItRightWall(main_matrix, position):
         return MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
             position[0] - 1, position[1])) in [
-            CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_EMPTY,
-                                                                                                   CHAR_FOR_COLUMN,
-                                                                                                   CHAR_FOR_MAP_BOARD]
+            CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_EMPTY,
+                                                                                                    CHAR_FOR_COLUMN,
+                                                                                                    CHAR_FOR_MAP_BOARD]
 
     @staticmethod
     def IsItLeftWall(main_matrix, position):
@@ -649,15 +647,15 @@ class MapBuilder:
             position[0] - 1, position[1])) in [
             CHAR_FOR_EMPTY,
             CHAR_FOR_COLUMN,
-            CHAR_FOR_MAP_BOARD] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_FLOR]
+            CHAR_FOR_MAP_BOARD] and MapBuilder.GetTile(main_matrix, (position[0] + 1, position[1])) in [CHAR_FOR_FLOOR]
 
     @staticmethod
     def IsItDownWall(main_matrix, position):
         return MapBuilder.GetTile(main_matrix, position) in [CHAR_FOR_UP_WALL] and MapBuilder.GetTile(main_matrix, (
             position[0], position[1] - 1)) in [
-            CHAR_FOR_FLOR] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [CHAR_FOR_EMPTY,
-                                                                                                   CHAR_FOR_COLUMN,
-                                                                                                   CHAR_FOR_MAP_BOARD]
+            CHAR_FOR_FLOOR] and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in [CHAR_FOR_EMPTY,
+                                                                                                    CHAR_FOR_COLUMN,
+                                                                                                    CHAR_FOR_MAP_BOARD]
 
     @staticmethod
     def IsItUpWall(main_matrix, position):
@@ -667,7 +665,7 @@ class MapBuilder:
             CHAR_FOR_COLUMN,
             CHAR_FOR_MAP_BOARD] and \
             MapBuilder.GetTile(main_matrix,
-                               (position[0], position[1] + 1)) in [CHAR_FOR_FLOR]
+                               (position[0], position[1] + 1)) in [CHAR_FOR_FLOOR]
 
     @staticmethod
     def ParseWalls(main_matrix):
@@ -694,7 +692,7 @@ class MapBuilder:
                                                                                                                  0] + 1,
                                                                                                              position[
                                                                                                                  1] - 1)) in [
-                CHAR_FOR_FLOR]
+                CHAR_FOR_FLOOR]
 
     @staticmethod
     def IsItLeftDownInCorner(main_matrix, position):
@@ -722,7 +720,7 @@ class MapBuilder:
                                                                                                                  0] - 1,
                                                                                                              position[
                                                                                                                  1] - 1)) in [
-                CHAR_FOR_FLOR]
+                CHAR_FOR_FLOOR]
 
     @staticmethod
     def IsItRightDownInCorner(main_matrix, position):
@@ -750,11 +748,15 @@ class MapBuilder:
                                                                                                                  0] + 1,
                                                                                                              position[
                                                                                                                  1] + 1)) in [
-                CHAR_FOR_FLOR]
+                CHAR_FOR_FLOOR]
 
     @staticmethod
     def IsItRightUpCorner(main_matrix, position):
-        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (position[0], position[1] + 1)) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (position[0] - 1, position[1] + 1)) in [CHAR_FOR_FLOR]
+        return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (
+        position[0], position[1] + 1)) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (
+        position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                (position[0] - 1, position[1] + 1)) in [
+            CHAR_FOR_FLOOR]
 
     @staticmethod
     def ParseCorners(main_matrix):
@@ -796,7 +798,6 @@ class MapBuilder:
             for j in range(1, len(main_matrix[0]) - 2):
                 if MapBuilder.IsThereWrongWall(main_matrix, (i, j)):
                     main_matrix[i][j] = CHAR_FOR_EMPTY
-        # self.SetDoorWaysOnMap()
 
     @staticmethod
     def IsThereFakeDoor(main_matrix, position):
@@ -905,13 +906,13 @@ class MapBuilder:
         for i in range(1, len(main_matrix) - 1):
             for j in range(1, len(main_matrix[0]) - 1):
                 if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR]:
-                    if MapBuilder.GetTile(main_matrix, (i + 1, j)) in [CHAR_FOR_FLOR]:
+                    if MapBuilder.GetTile(main_matrix, (i + 1, j)) in [CHAR_FOR_FLOOR]:
                         main_matrix[i - 1][j] = CHAR_FOR_PATH
-                    if MapBuilder.GetTile(main_matrix, (i - 1, j)) in [CHAR_FOR_FLOR]:
+                    if MapBuilder.GetTile(main_matrix, (i - 1, j)) in [CHAR_FOR_FLOOR]:
                         main_matrix[i + 1][j] = CHAR_FOR_PATH
-                    if MapBuilder.GetTile(main_matrix, (i, j + 1)) in [CHAR_FOR_FLOR]:
+                    if MapBuilder.GetTile(main_matrix, (i, j + 1)) in [CHAR_FOR_FLOOR]:
                         main_matrix[i][j - 1] = CHAR_FOR_PATH
-                    if MapBuilder.GetTile(main_matrix, (i, j - 1)) in [CHAR_FOR_FLOR]:
+                    if MapBuilder.GetTile(main_matrix, (i, j - 1)) in [CHAR_FOR_FLOOR]:
                         main_matrix[i][j + 1] = CHAR_FOR_PATH
 
     @staticmethod
@@ -940,7 +941,7 @@ class MapBuilder:
             for j in range(1, len(main_matrix[0]) - 1):
                 if MapBuilder.GetTile(main_matrix, (i, j)) in [CHAR_FOR_DOOR]:
                     dfs.DFSOnTheSpecificTiles(main_matrix, (i, j), matrix,
-                                              SET_WITH_WALLS + [CHAR_FOR_FLOR, CHAR_FOR_DOOR, CHAR_FOR_PATH])
+                                              SET_WITH_WALLS + [CHAR_FOR_FLOOR, CHAR_FOR_DOOR, CHAR_FOR_PATH])
                     sign = True
                     break
             if sign:
