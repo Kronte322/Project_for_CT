@@ -80,6 +80,7 @@ class Map:
         self.global_map_position = [0, 0]
         self.current_room_position = [0, 0]
         self.mini_map_position = [0, 0]
+        self.position_of_minimap_on_screen = POSITION_OF_MINI_MAP
 
         self.Blit(self.mappa, self.matrix_with_map, (0, 0))
 
@@ -199,7 +200,7 @@ class Map:
         tile = self.GetTile((position[0] - self.global_map_position[0], position[1] - self.global_map_position[1]))
         return tile in [CHAR_FOR_FLOOR, CHAR_FOR_DOOR, CHAR_FOR_PATH]
 
-    def SetCurrentRoom(self, player_position, flag=False):
+    def SetCurrentRoom(self, player_position, minimap, flag=False):
         if not flag:
             player_position = [player_position[0] - self.global_map_position[0],
                                player_position[1] - self.global_map_position[1]]
@@ -230,7 +231,8 @@ class Map:
                         self.visited_tiles.keys()):
                     for i in current_room:
                         self.visited_tiles[i] = True
-                self.BlitSpecificOnMap(self.map_for_minimap, current_room, SIZE_OF_TILE_ON_MINI_MAP)
+
+                minimap.BlitOnMiniMap(current_room)
                 left_upper_corner = self.BlitMap(current_room)
                 copy = [self.current_room.copy(), left_upper_corner, self.tiles_for_current_room.copy()]
                 for i in keys:
@@ -251,8 +253,6 @@ class Map:
     def Render(self, display):
         # display.blit(self.mappa, self.global_map_position)
         display.blit(self.current_room, self.current_room_position)
-        self.mini_map.blit(self.map_for_minimap, self.mini_map_position)
-        display.blit(self.mini_map, POSITION_OF_MINI_MAP)
 
     def MoveMiniMap(self, position):
         self.mini_map_position[0] += position[0] * SIZE_OF_TILE_ON_MINI_MAP / SIZE_OF_TILE
@@ -264,14 +264,16 @@ class Map:
         self.current_room_position[0] += position[0]
         self.current_room_position[1] += position[1]
 
-    def SpawnPosition(self):
+    def SpawnPosition(self, minimap):
         while True:
             x = random.randrange(1, SIZE_OF_MAP[0])
             y = random.randrange(1, SIZE_OF_MAP[1])
             if self.matrix_with_map[x][y] in [CHAR_FOR_FLOOR]:
                 self.global_map_position = [-x * SIZE_OF_TILE + SPAWN_POSITION[0],
                                             -y * SIZE_OF_TILE + SPAWN_POSITION[1]]
+                minimap.SetStartPosition((-x, -y))
                 self.mini_map_position = [-x * SIZE_OF_TILE_ON_MINI_MAP + SIZE_OF_MINI_MAP[0] // 2,
                                           -y * SIZE_OF_TILE_ON_MINI_MAP + SIZE_OF_MINI_MAP[1] // 2]
-                self.SetCurrentRoom((x * SIZE_OF_TILE, y * SIZE_OF_TILE), flag=True)
+                self.SetCurrentRoom((x * SIZE_OF_TILE, y * SIZE_OF_TILE), minimap, flag=True)
                 return None
+
