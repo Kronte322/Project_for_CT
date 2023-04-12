@@ -197,7 +197,10 @@ class Map:
         return position[0] // SIZE_OF_TILE, position[1] // SIZE_OF_TILE
 
     def CanStandThere(self, position):
-        tile = self.GetTile((position[0] - self.global_map_position[0], position[1] - self.global_map_position[1]))
+        try:
+            tile = self.GetTile((position[0] - self.global_map_position[0], position[1] - self.global_map_position[1]))
+        except:
+            return False
         return tile in [CHAR_FOR_FLOOR, CHAR_FOR_DOOR, CHAR_FOR_PATH]
 
     def SetCurrentRoom(self, player_position, minimap, flag=False):
