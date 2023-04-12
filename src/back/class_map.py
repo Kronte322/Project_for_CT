@@ -277,3 +277,6 @@ class Map:
                 self.SetCurrentRoom((x * SIZE_OF_TILE, y * SIZE_OF_TILE), minimap, flag=True)
                 return None
 
+
+def mappa():
+    return None

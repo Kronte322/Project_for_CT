@@ -7,6 +7,14 @@ from src.back.constants_for_map import *
 from src.back.class_minimap import MiniMap
 from src.back.constants_with_paths_to_files import *
 import math
+from src.back.entity_2 import Enemy
+# from src.back.enemy import Entity
+
+import math
+import random
+
+import pygame
+
 
 sys.setrecursionlimit(10000000)
 mappa = class_map.Map()
@@ -99,12 +107,15 @@ class Player:
             self.rect.y -= self.kSpeed
             mappa.MoveMap([0, -self.kSpeed])
 
+    def get_player_position(player):
+        return player.rect.x, player.rect.y
+
     def render(self, display):
         display.blit(self.image, (self.rect.x, self.rect.y))
 
 
 player = Player()
-
+enemy = Enemy()
 
 RUNNING = True
 while RUNNING:
@@ -115,13 +126,14 @@ while RUNNING:
         mini_map.ProcessEvents(event=event)
 
     player.move()
-
+    # enemy.move(player.get_player_position())
     display.fill((37, 19, 26))
 
     mappa.SetCurrentRoom([player.rect.x + kSizeOfCharacter // 2, player.rect.y + kSizeOfCharacter], mini_map)
     mappa.Render(display)
 
     player.render(display)
+    enemy.render(display)
 
     mini_map.RenderMiniMap(display)
 
