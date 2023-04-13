@@ -13,6 +13,7 @@ kSpawnPosition = [kSizeOfDisplay[0] // 2, kSizeOfDisplay[1] // 2]
 kOneHeartInHP = 200
 kSizeOfHeart = 24
 path_to_heart = "../tile_sets/tiles_for_chars/hearts/heart_"
+path_to_skeleton = "../tile_sets/tiles_for_chars/skeleton/skeleton_"
 
 
 def norm(vector):
@@ -28,9 +29,10 @@ def normalized(vector):
 
 class Player:
     def __init__(self, display):
-        self.image_of_character = pygame.image.load(PATH_TO_CHARACTER)
+        self.image_of_character = pygame.image.load(path_to_skeleton + "down/sprite_0.png").convert_alpha()
         self.image_of_character = pygame.transform.scale(
             self.image_of_character, (kSizeOfCharacter, kSizeOfCharacter))
+        self.image_num = 0
 
         self.moveBox = (
             kSizeOfDisplay[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, kSizeOfDisplay[1] // 2 - SIZE_OF_MOVE_BOX[1] //
@@ -137,6 +139,32 @@ class Player:
                     fire.rect.y -= self.direction[1]
             mappa.MoveMap([0, -self.direction[1]])
 
+        if self.direction == [0, 0]:
+            self.image_of_character = pygame.image.load(path_to_skeleton + "down/sprite_0.png").convert_alpha()
+            self.image_of_character = pygame.transform.scale(
+                self.image_of_character, (kSizeOfCharacter, kSizeOfCharacter))
+            self.image_num = 0
+        else:
+            direct = ""
+            if self.direction[0] > 0:
+                direct = "right/sprite_"
+            elif self.direction[0] < 0:
+
+                direct = "left/sprite_"
+
+            elif self.direction[1] > 0:
+                direct = "down/sprite_"
+
+            elif self.direction[1] < 0:
+                direct = "up/sprite_"
+
+            self.image_of_character = pygame.image.load(
+                path_to_skeleton + direct + str(self.image_num) + ".png").convert_alpha()
+            self.image_of_character = pygame.transform.scale(
+                self.image_of_character, (kSizeOfCharacter, kSizeOfCharacter))
+            self.image_num += 1
+            self.image_num %= 9
+
     def ranged_attack(self, display, mappa):
         self.left_mouse_up = not pygame.mouse.get_pressed()[0]
         if self.left_mouse_up and self.left_mouse_down and self.magic_points >= 5:  # and (time.time()-self.last_fire_time) > 0.3
@@ -191,7 +219,7 @@ class Player:
 
         self.right_mouse_down = pygame.mouse.get_pressed()[2]
 
-    def heath_icon(self, display):
+    def health_icon(self, display):
         full_hearts = self.health_points // kOneHeartInHP
         is_mode_null = self.health_points % kOneHeartInHP == 0
         num_of_not_full_heart = 4 - ((self.health_points % kOneHeartInHP) * 5 // kOneHeartInHP)
@@ -225,7 +253,7 @@ class Player:
                 x += kSizeOfHeart * 5 // 4
 
     def personage_icon(self, display):
-        image_path = "../tile_sets/tiles_for_chars/sprite_1.png"
+        image_path = "../tile_sets/tiles_for_chars/skeleton/skeleton.png"
         image_of_personage = pygame.image.load(image_path).convert_alpha()
         image_of_personage = pygame.transform.scale(
             image_of_personage, (kSizeOfCharacter, kSizeOfCharacter))
@@ -244,7 +272,7 @@ class Player:
         display.blit(self.image_of_character, self.rect)
         self.ranged_attack(display, mappa)
         self.melee_attack(display)
-        self.heath_icon(display)
+        self.health_icon(display)
         self.personage_icon(display)
         self.mp_icon(display)
         if self.magic_points <= self.max_magic - self.magic_recovery:
