@@ -10,6 +10,8 @@ import math
 from src.back.projectile import Projectile
 import time
 from src.back.player import Player
+from src.back.personages import Personage, personages
+
 
 sys.setrecursionlimit(10000000)
 mappa = class_map.Map()
@@ -31,7 +33,7 @@ mini_map = MiniMap()
 
 mappa.SpawnPosition(mini_map)
 
-player = Player(display)
+player = Player(display, personages[4])
 
 RUNNING = True
 while RUNNING:
