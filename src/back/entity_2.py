@@ -60,17 +60,3 @@ class Enemy:
 
     def render(self, display):
         display.blit(self.image, (self.rect.x, self.rect.y))
-
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
