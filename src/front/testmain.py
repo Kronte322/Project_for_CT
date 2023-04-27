@@ -33,7 +33,7 @@ mini_map = MiniMap()
 
 mappa.SpawnPosition(mini_map)
 
-player = Player(display, personages[4])
+player = Player(display, personages[12], kSpawnPosition)
 
 RUNNING = True
 while RUNNING:

@@ -64,3 +64,83 @@ magic_wizard = Personage("../tile_sets/tiles_for_chars/personages/magic_wizard/s
                          "magic_wizard", 6)
 
 personages.append(magic_wizard)
+
+fantasy_warior = Personage("../tile_sets/tiles_for_chars/personages/fantasy_warior/stat/sprite_", 10,
+                           "../tile_sets/tiles_for_chars/personages/fantasy_warior/right/sprite_", 8,
+                           "../tile_sets/tiles_for_chars/personages/fantasy_warior/left/sprite_", 8,
+                           "../tile_sets/tiles_for_chars/personages/fantasy_warior/right/sprite_", 8,
+                           "../tile_sets/tiles_for_chars/personages/fantasy_warior/left/sprite_", 8,
+                           "../tile_sets/tiles_for_chars/personages/fantasy_warior/fantasy_warior.png",
+                           "fantasy_warior", 6)
+
+personages.append(fantasy_warior)
+
+huntress = Personage("../tile_sets/tiles_for_chars/personages/huntress/stat/sprite_", 7,
+                     "../tile_sets/tiles_for_chars/personages/huntress/right/sprite_", 7,
+                     "../tile_sets/tiles_for_chars/personages/huntress/left/sprite_", 7,
+                     "../tile_sets/tiles_for_chars/personages/huntress/right/sprite_", 7,
+                     "../tile_sets/tiles_for_chars/personages/huntress/left/sprite_", 7,
+                     "../tile_sets/tiles_for_chars/personages/huntress/huntress.png",
+                     "huntress", 8)
+
+personages.append(huntress)
+
+warior = Personage("../tile_sets/tiles_for_chars/personages/warior/stat/sprite_", 4,
+                   "../tile_sets/tiles_for_chars/personages/warior/right/sprite_", 6,
+                   "../tile_sets/tiles_for_chars/personages/warior/left/sprite_", 6,
+                   "../tile_sets/tiles_for_chars/personages/warior/right/sprite_", 6,
+                   "../tile_sets/tiles_for_chars/personages/warior/left/sprite_", 6,
+                   "../tile_sets/tiles_for_chars/personages/warior/warior.png",
+                   "warior", 10)
+
+personages.append(warior)
+
+king = Personage("../tile_sets/tiles_for_chars/personages/king/stat/sprite_", 8,
+                 "../tile_sets/tiles_for_chars/personages/king/right/sprite_", 8,
+                 "../tile_sets/tiles_for_chars/personages/king/left/sprite_", 8,
+                 "../tile_sets/tiles_for_chars/personages/king/right/sprite_", 8,
+                 "../tile_sets/tiles_for_chars/personages/king/left/sprite_", 8,
+                 "../tile_sets/tiles_for_chars/personages/king/king.png",
+                 "king", 8)
+
+personages.append(king)
+
+skeleton_warior = Personage("../tile_sets/tiles_for_chars/personages/skeleton_warior/stat/sprite_", 4,
+                            "../tile_sets/tiles_for_chars/personages/skeleton_warior/right/sprite_", 4,
+                            "../tile_sets/tiles_for_chars/personages/skeleton_warior/left/sprite_", 4,
+                            "../tile_sets/tiles_for_chars/personages/skeleton_warior/right/sprite_", 4,
+                            "../tile_sets/tiles_for_chars/personages/skeleton_warior/left/sprite_", 4,
+                            "../tile_sets/tiles_for_chars/personages/skeleton_warior/skeleton_warior.png",
+                            "skeleton_warior", 5)
+
+personages.append(skeleton_warior)
+
+goblin = Personage("../tile_sets/tiles_for_chars/personages/goblin/stat/sprite_", 4,
+                   "../tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
+                   "../tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
+                   "../tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
+                   "../tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
+                   "../tile_sets/tiles_for_chars/personages/goblin/goblin.png",
+                   "goblin", 6)
+
+personages.append(goblin)
+
+mushroom = Personage("../tile_sets/tiles_for_chars/personages/mushroom/stat/sprite_", 4,
+                     "../tile_sets/tiles_for_chars/personages/mushroom/right/sprite_", 8,
+                     "../tile_sets/tiles_for_chars/personages/mushroom/left/sprite_", 8,
+                     "../tile_sets/tiles_for_chars/personages/mushroom/right/sprite_", 8,
+                     "../tile_sets/tiles_for_chars/personages/mushroom/left/sprite_", 8,
+                     "../tile_sets/tiles_for_chars/personages/mushroom/mushroom.png",
+                     "mushroom", 6)
+
+personages.append(mushroom)
+
+flying_eye = Personage("../tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,
+                       "../tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,
+                       "../tile_sets/tiles_for_chars/personages/flying_eye/left/sprite_", 7,
+                       "../tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,
+                       "../tile_sets/tiles_for_chars/personages/flying_eye/left/sprite_", 7,
+                       "../tile_sets/tiles_for_chars/personages/flying_eye/flying_eye.png",
+                       "flying_eye", 8)
+
+personages.append(flying_eye)

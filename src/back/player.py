@@ -31,7 +31,7 @@ def normalized(vector):
 
 
 class Player:
-    def __init__(self, display, personage: Personage):
+    def __init__(self, display, personage: Personage, spawnposition):
         self.personage = personage
         self.image_stat = Animation(self.personage.path_stat, self.personage.num_stat,
                                     (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
@@ -51,7 +51,7 @@ class Player:
             2, kSizeOfDisplay[0] // 2 + SIZE_OF_MOVE_BOX[0] // 2,
             kSizeOfDisplay[1] // 2 + SIZE_OF_MOVE_BOX[1] // 2)
 
-        self.rect = self.image_of_character.get_rect(topleft=(kSpawnPosition[0], kSpawnPosition[1]))
+        self.rect = self.image_of_character.get_rect(topleft=spawnposition)
         display.blit(self.image_of_character, self.rect)
 
         self.max_speed = 8
@@ -84,6 +84,15 @@ class Player:
         self.image_of_icon = pygame.image.load(self.path_to_icon).convert_alpha()
         self.image_of_icon = pygame.transform.scale(
             self.image_of_icon, (kSizeOfCharacter, kSizeOfCharacter))
+
+    def GetImage(self):
+        return self.image_of_character
+
+    def GetPosition(self):
+        return tuple(self.rect.x, self.rect.y)
+
+    def GetSize(self):
+        return self.rect.size
 
     def move(self, mappa, mini_map):
         self.direction = [0, 0]

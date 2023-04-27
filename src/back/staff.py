@@ -23,15 +23,15 @@ class Staff:
                      (players_rect[0] + self.diff_with_players_x[self.diff_with_players_x_num],
                       players_rect[1] + self.staff_y))
 
-        self.num_of_minerals = 1
-        self.coord_y_of_minerals = (6, 22, 38)
-        self.list_of_mineral_num = [0, 5, 10]
+        self.num_of_minerals = 3
+        self.coord_y_of_minerals = (6, 14, 26)
+        self.list_of_mineral_num = [0, 10, 5]
         self.mineral_delta = [1, 1, 1]
         self.path_to_minerals = []
         self.image_of_mineral = []
 
         for i in range(self.num_of_minerals):
-            self.path_to_minerals.append("../tile_sets/tiles_for_chars/magic_crystals/green_crystal.png")
+            self.path_to_minerals.append("../tile_sets/tiles_for_chars/magic_crystals/red_crystal.png")
             self.image_of_mineral.append(pygame.image.load(self.path_to_minerals[i]).convert_alpha())
             self.image_of_mineral[i] = pygame.transform.scale(
                 self.image_of_mineral[i], (8, 8))
@@ -43,7 +43,7 @@ class Staff:
         display.blit(self.image_of_mineral[i],
                      (players_rect[0] + self.diff_with_players_x[diff_with_players_x_num] +
                       list_of_coord[self.list_of_mineral_num[i] // 3][0],
-                      players_rect[1] + self.staff_y + 6 + list_of_coord[self.list_of_mineral_num[i] // 3][
+                      players_rect[1] + self.staff_y + self.coord_y_of_minerals[i] + list_of_coord[self.list_of_mineral_num[i] // 3][
                           1]))
 
     def render(self, display, players_rect):
@@ -60,7 +60,7 @@ class Staff:
             if self.mineral_delta[i] == 1:
                 self.blit_mineral(display, players_rect, self.diff_with_players_x_num, i)
 
-            self.list_of_mineral_num[i] += self.mineral_delta[i]
+            self.list_of_mineral_num[i] += (self.mineral_delta[i] * (-1 if i == 1 else 1))
             if self.list_of_mineral_num[i] == 45 or self.list_of_mineral_num[i] == 0:
                 self.mineral_delta[i] *= -1
 
