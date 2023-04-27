@@ -9,7 +9,7 @@ from src.back.constants_with_paths_to_files import *
 import math
 
 sys.setrecursionlimit(10000000)
-mappa = class_map.Map()
+mappa = class_map.MapProcessor()
 pygame.init()
 
 kSizeOfDisplay = WINDOW_SIZE
@@ -27,7 +27,7 @@ image_for_zoom.fill((0, 0, 0, 0))
 mini_map = MiniMap()
 
 
-mappa.SpawnPosition(mini_map)
+mappa.SpawnPlayer(mini_map)
 
 
 class Player:
@@ -59,9 +59,8 @@ class Player:
                             self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
                 if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
                                         self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
-                    self.rect.y -= self.kSpeed
                     mini_map.MoveMiniMap([0, self.kSpeed])
-            # self.rect.y -= self.kSpeed
+                    self.rect.y -= self.kSpeed
         if key[pygame.K_a]:
             if mappa.CanStandThere(
                     (self.rect.x - self.kSpeed, self.rect.y + kSizeOfCharacter)):
@@ -88,23 +87,18 @@ class Player:
             # self.rect.x += self.kSpeed
         if player.rect.x <= self.moveBox[0]:
             self.rect.x += self.kSpeed
-            mappa.MoveMap([self.kSpeed, 0])
         elif player.rect.x >= self.moveBox[2] - 48:
             self.rect.x -= self.kSpeed
-            mappa.MoveMap([-self.kSpeed, 0])
         if player.rect.y <= self.moveBox[1]:
             self.rect.y += self.kSpeed
-            mappa.MoveMap([0, self.kSpeed])
         elif player.rect.y >= self.moveBox[3] - 48:
             self.rect.y -= self.kSpeed
-            mappa.MoveMap([0, -self.kSpeed])
 
     def render(self, display):
         display.blit(self.image, (self.rect.x, self.rect.y))
 
 
 player = Player()
-
 
 RUNNING = True
 while RUNNING:
@@ -118,8 +112,9 @@ while RUNNING:
 
     display.fill((37, 19, 26))
 
-    mappa.SetCurrentRoom([player.rect.x + kSizeOfCharacter // 2, player.rect.y + kSizeOfCharacter], mini_map)
-    mappa.Render(display)
+    mappa.UpdateCurrentRoom([player.rect.x + kSizeOfCharacter // 2, player.rect.y + kSizeOfCharacter], mini_map)
+
+    mappa.RenderRoom(display)
 
     player.render(display)
 

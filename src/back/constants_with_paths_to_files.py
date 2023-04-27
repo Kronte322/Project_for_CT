@@ -1,5 +1,4 @@
-
-PATH_TO_DOOR_IMG = "../tile_sets/tiles_for_map/doors/sprite_066.png"
+PATH_TO_DOOR_IMG = "../tile_sets/tiles_for_map/doors/down_doors/sprite_0.png"
 PATH_TO_EMPTY_IMG = "../tile_sets/tiles_for_map/back_ground/sprite_078.png"
 PATH_TO_LEFT_DOWN_IN_CORNER = "../tile_sets/tiles_for_map/left_down_corner/in_corner.png"
 PATH_TO_LEFT_DOWN_OUT_CORNER = "../tile_sets/tiles_for_map/left_down_corner/out_corner.png"
@@ -13,3 +12,15 @@ PATH_TO_FLOORS = "../tile_sets/tiles_for_map/floor/sprite_"
 PATH_TO_CHARACTER = "../tile_sets/tiles_for_chars/sprite_0.png"
 PATH_TO_CHARACTER_ON_MINI_MAP = "../tile_sets/tiles_for_chars/sprite_1.png"
 EXTENSION_OF_IMG_FILES = ".png"
+
+PATH_TO_CLOSED_LEFT_DOOR = "../tile_sets/tiles_for_map/doors/left_doors/sprite_0.png"
+PATH_TO_DEFINITELY_CLOSED_LEFT_DOOR = "../tile_sets/tiles_for_map/doors/left_doors/sprite_1.png"
+
+PATH_TO_CLOSED_RIGHT_DOOR = "../tile_sets/tiles_for_map/doors/right_doors/sprite_0.png"
+PATH_TO_DEFINITELY_CLOSED_RIGHT_DOOR = "../tile_sets/tiles_for_map/doors/right_doors/sprite_1.png"
+
+PATH_TO_CLOSED_UP_DOOR = "../tile_sets/tiles_for_map/doors/up_doors/sprite_0.png"
+PATH_TO_DEFINITELY_CLOSED_UP_DOOR = "../tile_sets/tiles_for_map/doors/up_doors/sprite_1.png"
+
+PATH_TO_CLOSED_DOWN_DOOR = "../tile_sets/tiles_for_map/doors/down_doors/sprite_0.png"
+PATH_TO_DEFINITELY_DOWN_UP_DOOR = "../tile_sets/tiles_for_map/doors/down_doors/sprite_1.png"

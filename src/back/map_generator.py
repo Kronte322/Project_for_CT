@@ -1069,7 +1069,8 @@ class DFSAlgoForMapBuilder:
                         keys.append(vertex)
                 if flag == 'room':
                     if MapBuilder.GetTile(main_matrix, i) in [CHAR_FOR_DOOR]:
-                        keys.append(i)
+                        keys[0][vertex] = vertex
+                        keys[1][vertex] = vertex
                 if self.used.get(i) is None and i != self.parents.get(vertex):
                     self.parents[i] = vertex
                     self.RecursiveDFSOnTheSpecific(main_matrix, i, final_matrix, tiles, current_depth=current_depth + 1,

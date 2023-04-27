@@ -23,7 +23,7 @@ class MiniMap:
         self.is_tabed = False
 
     def BlitOnMiniMap(self, tiles_for_blit):
-        Map.BlitSpecificOnMap(self.map_for_minimap, tiles_for_blit, SIZE_OF_TILE_ON_MINI_MAP)
+        Map.BlitSpecificTilesOnSurface(self.map_for_minimap, tiles_for_blit, SIZE_OF_TILE_ON_MINI_MAP)
 
     def RenderMiniMap(self, display):
         self.mini_map.fill((0, 0, 0, 0))
