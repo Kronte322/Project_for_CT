@@ -7,6 +7,11 @@ from src.back.constants_for_map import *
 from src.back.class_minimap import MiniMap
 from src.back.constants_with_paths_to_files import *
 import math
+from src.back.projectile import Projectile
+import time
+from src.back.player import Player
+from src.back.personages import Personage, personages
+
 
 sys.setrecursionlimit(10000000)
 mappa = class_map.MapProcessor()
@@ -26,79 +31,10 @@ image_for_zoom.fill((0, 0, 0, 0))
 
 mini_map = MiniMap()
 
-
-mappa.SpawnPlayer(mini_map)
-
-
-class Player:
-    def __init__(self):
-        self.kSpeed = 14
-        # self.kSpeed = 1.3dw
-        self.image = pygame.Surface(
-            (kSizeOfCharacter, kSizeOfCharacter), flags=pygame.SRCALPHA)
-        self.image.fill((0, 0, 0, 0))
-        self.image_of_character = pygame.image.load(PATH_TO_CHARACTER)
-        self.image_of_character = pygame.transform.scale(
-            self.image_of_character, (kSizeOfCharacter, kSizeOfCharacter))
-        self.image.blit(self.image_of_character, (0, 0))
-        self.rect = pygame.Rect((kSpawnPosition[0], kSpawnPosition[1]), (kSizeOfCharacter, kSizeOfCharacter))
-        # self.rect = pygame.Rect(
-        #     (0, 0), (kSizeOfCharacter, kSizeOfCharacter))
-
-        self.moveBox = (
-            kSizeOfDisplay[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, kSizeOfDisplay[1] // 2 - SIZE_OF_MOVE_BOX[1] //
-            2, kSizeOfDisplay[0] // 2 + SIZE_OF_MOVE_BOX[0] // 2,
-            kSizeOfDisplay[1] // 2 + SIZE_OF_MOVE_BOX[1] // 2)
-
-    def move(self):
-        key = pygame.key.get_pressed()
-        if key[pygame.K_w]:
-            if mappa.CanStandThere(
-                    (
-                            self.rect.x,
-                            self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
-                if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
-                                        self.rect.y + kSizeOfCharacter - self.kSpeed - 8)):
-                    mini_map.MoveMiniMap([0, self.kSpeed])
-                    self.rect.y -= self.kSpeed
-        if key[pygame.K_a]:
-            if mappa.CanStandThere(
-                    (self.rect.x - self.kSpeed, self.rect.y + kSizeOfCharacter)):
-                self.rect.x -= self.kSpeed
-                mini_map.MoveMiniMap([self.kSpeed, 0])
-
-            # self.rect.x -= self.kSpeed
-        if key[pygame.K_s]:
-            if mappa.CanStandThere(
-                    (self.rect.x, self.rect.y + kSizeOfCharacter + self.kSpeed)):
-                if mappa.CanStandThere((self.rect.x + kSizeOfCharacter,
-                                        self.rect.y + kSizeOfCharacter + self.kSpeed)):
-                    self.rect.y += self.kSpeed
-                    mini_map.MoveMiniMap([0, -self.kSpeed])
-
-            # self.rect.y += self.kSpeed
-        if key[pygame.K_d]:
-            if mappa.CanStandThere(
-                    (self.rect.x + kSizeOfCharacter + self.kSpeed,
-                     self.rect.y + kSizeOfCharacter)):
-                self.rect.x += self.kSpeed
-                mini_map.MoveMiniMap([-self.kSpeed, 0])
-
-            # self.rect.x += self.kSpeed
-        if player.rect.x <= self.moveBox[0]:
-            self.rect.x += self.kSpeed
-        elif player.rect.x >= self.moveBox[2] - 48:
-            self.rect.x -= self.kSpeed
-        if player.rect.y <= self.moveBox[1]:
-            self.rect.y += self.kSpeed
-        elif player.rect.y >= self.moveBox[3] - 48:
-            self.rect.y -= self.kSpeed
-
-    def render(self, display):
-        display.blit(self.image, (self.rect.x, self.rect.y))
+mappa.SpawnPosition(mini_map)
 
 
-player = Player()
+player = Player(display, personages[12], kSpawnPosition)
 
 RUNNING = True
 while RUNNING:
@@ -108,7 +44,7 @@ while RUNNING:
             RUNNING = False
         mini_map.ProcessEvents(event=event)
 
-    player.move()
+    player.move(mappa, mini_map)
 
     display.fill((37, 19, 26))
 
@@ -116,7 +52,8 @@ while RUNNING:
 
     mappa.RenderRoom(display)
 
-    player.render(display)
+    player.render(display, mappa)
+    # player.fire(display, mappa)
 
     mini_map.RenderMiniMap(display)
 

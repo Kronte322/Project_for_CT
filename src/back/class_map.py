@@ -326,7 +326,10 @@ class Map:
         return position[0] // SIZE_OF_TILE, position[1] // SIZE_OF_TILE
 
     def CanStandThere(self, position):
-        tile = self.GetTile(self.GetPositionOfTile(position))
+        try:
+            tile = self.GetTile(self.GetPositionOfTile(position))
+        except:
+            return False
         return tile in [CHAR_FOR_FLOOR, CHAR_FOR_DOOR, CHAR_FOR_PATH]
 
     def GetCurrentRoom(self, player_position, current_room):
