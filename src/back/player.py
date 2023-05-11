@@ -258,7 +258,7 @@ class Player:
 
     def render(self, display, position):
         display.blit(self.image_of_character, position)
-        self.staff.render(display, self.rect)
+        self.staff.render(display, pygame.Rect(position[0], position[1], kSizeOfCharacter, kSizeOfCharacter))
         # self.ranged_attack(display, mappa)
         # self.melee_attack(display)
         self.health_icon(display)
