@@ -256,7 +256,7 @@ class Player:
             image_of_mp_icon, (240, 24))
         display.blit(image_of_mp_icon, (80, 45))
 
-    def render(self, display, mappa, position):
+    def render(self, display, position):
         display.blit(self.image_of_character, position)
         self.staff.render(display, self.rect)
         # self.ranged_attack(display, mappa)
@@ -270,7 +270,7 @@ class Player:
             self.health_points += self.health_recovery
         if self.fires:
             for (i, fire) in enumerate(self.fires):
-                if fire.render(display, mappa):
+                if fire.render(display):
                     self.fires.pop(i)
 
         elif self.slash_num > 0:
@@ -286,3 +286,7 @@ class Player:
         self.move(mappa, render)
         self.melee_attack(rivals)
         self.ranged_attack()
+        if self.fires:
+            for (i, fire) in enumerate(self.fires):
+                if fire.update(mappa):
+                    self.fires.pop(i)

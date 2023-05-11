@@ -41,7 +41,10 @@ class Projectile:
         self.num_of_mineral = num_of_mineral
         self.sin_num = sinnum
 
-    def render(self, display, mappa, rivals=None):
+    def render(self, display):
+        display.blit(self.image_of_projectile, self.rect)
+
+    def update(self, mappa, rivals=None):
         is_touch_with_rival = False
 
         if rivals is None or rivals == []:
@@ -65,13 +68,13 @@ class Projectile:
                 return True
             image_path_fire = self.path + str(
                 self.image_num // 2) + ".png"
-            image = pygame.image.load(image_path_fire).convert_alpha()
-            image = pygame.transform.scale(
-                image, (kSizeOfCharacter, kSizeOfCharacter))
-            display.blit(image, self.rect)
+            self.image_of_projectile = pygame.image.load(image_path_fire).convert_alpha()
+            self.image_of_projectile = pygame.transform.scale(
+                self.image_of_projectile, (kSizeOfCharacter, kSizeOfCharacter))
+            # display.blit(image, self.rect)
             self.image_num += 1
         else:
-            display.blit(self.image_of_projectile, self.rect)
+            # display.blit(self.image_of_projectile, self.rect)
             self.rect.x += self.direction[0] * self.speed
             self.rect.y += self.direction[1] * self.speed
             if self.num_of_mineral != 0:
