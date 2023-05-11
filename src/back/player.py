@@ -89,6 +89,8 @@ class Player:
 
     def GetCenterPosition(self):
         return self.rect.x + kSizeOfCharacter // 2, self.rect.y + kSizeOfCharacter // 2
+    def GetStandPosition(self):
+        return self.rect.x + kSizeOfCharacter // 2, self.rect.y + kSizeOfCharacter
 
     def GetSize(self):
         return self.rect.size
