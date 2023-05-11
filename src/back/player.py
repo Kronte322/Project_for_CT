@@ -294,7 +294,7 @@ class Player:
     def update(self, mappa, render, rivals=None):
         self.move(mappa, render)
         self.melee_attack(rivals)
-        self.ranged_attack()
+        # self.ranged_attack()
         if self.fires:
             for (i, fire) in enumerate(self.fires):
                 if fire.update(mappa):

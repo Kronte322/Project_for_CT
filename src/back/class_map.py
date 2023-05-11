@@ -62,7 +62,7 @@ class Space(ABC):
         self.left_upper_corner = Map.GetLeftUpperCornerForListOfTiles(tiles)
 
     def GetPosition(self):
-        return self.left_upper_corner
+        return self.left_upper_corner[0] * SIZE_OF_TILE, self.left_upper_corner[1] * SIZE_OF_TILE
 
     def GetTiles(self):
         return self.tiles
