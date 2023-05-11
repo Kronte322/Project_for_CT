@@ -90,7 +90,7 @@ class Player:
     def GetSize(self):
         return self.rect.size
 
-    def move(self, mappa, mini_map, render):
+    def move(self, mappa, render):
         self.direction = [0, 0]
 
         key = pygame.key.get_pressed()
@@ -144,7 +144,7 @@ class Player:
 
         self.rect.x += self.direction[0]
         self.rect.y += self.direction[1]
-        mini_map.MoveMiniMap([-self.direction[0], -self.direction[1]])
+        # mini_map.MoveMiniMap([-self.direction[0], -self.direction[1]])
 
         if self.direction == [0, 0]:
             self.image_of_character = self.image_stat.get_image()
@@ -161,10 +161,9 @@ class Player:
         elif self.direction[1] < 0:
             self.image_of_character = self.image_up.get_image()
 
-        render.ChangePositionOfPlayerAccordingToMoveBox(self.direction);
+        render.ChangePositionOfPlayerAccordingToMoveBox(self.direction)
 
-
-    def ranged_attack(self, display, mappa):
+    def ranged_attack(self):
         self.left_mouse_up = not pygame.mouse.get_pressed()[0]
         if self.left_mouse_up and self.left_mouse_down and self.magic_points >= 5:  # and (time.time()-self.last_fire_time) > 0.3
             mouse = pygame.mouse.get_pos()
@@ -183,12 +182,7 @@ class Player:
 
         self.left_mouse_down = pygame.mouse.get_pressed()[0]
 
-        if self.fires:
-            for (i, fire) in enumerate(self.fires):
-                if fire.render(display, mappa):
-                    self.fires.pop(i)
-
-    def melee_attack(self, display, rivals=None):  # display, mappa
+    def melee_attack(self, rivals=None):  # display, mappa
         self.right_mouse_up = not pygame.mouse.get_pressed()[2]
 
         if self.slash_num == 0 and self.right_mouse_up and self.right_mouse_down and \
@@ -203,7 +197,7 @@ class Player:
                 image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
             slash_rect = image_of_slash.get_rect(
                 topleft=(self.rect[0] - kSizeOfCharacter // 4, self.rect[1] - kSizeOfCharacter // 4))
-            display.blit(image_of_slash, slash_rect)
+            # display.blit(image_of_slash, slash_rect)
             self.slash_num += 1
 
             if rivals is None or not rivals:
@@ -213,15 +207,6 @@ class Player:
                     if slash_rect.colliderect(rival.rect):
                         # тут будет передаваться урон мобу
                         pass
-
-        elif self.slash_num > 0:
-            slash_path = "src/tile_sets/tiles_for_chars/slash/slash_" + str(self.slash_num) + ".png"
-            image_of_slash = pygame.image.load(slash_path).convert_alpha()
-            image_of_slash = pygame.transform.scale(
-                image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
-            display.blit(image_of_slash, (self.rect[0] - kSizeOfCharacter // 4, self.rect[1] - kSizeOfCharacter // 4))
-            self.slash_num += 1
-            self.slash_num %= 15
 
         self.right_mouse_down = pygame.mouse.get_pressed()[2]
 
@@ -274,8 +259,8 @@ class Player:
     def render(self, display, mappa):
         display.blit(self.image_of_character, self.rect)
         self.staff.render(display, self.rect)
-        self.ranged_attack(display, mappa)
-        self.melee_attack(display)
+        # self.ranged_attack(display, mappa)
+        # self.melee_attack(display)
         self.health_icon(display)
         self.personage_icon(self, display)
         self.mp_icon(display)
@@ -283,3 +268,21 @@ class Player:
             self.magic_points += self.magic_recovery
         if self.health_points <= self.max_health - self.health_recovery:
             self.health_points += self.health_recovery
+        if self.fires:
+            for (i, fire) in enumerate(self.fires):
+                if fire.render(display, mappa):
+                    self.fires.pop(i)
+
+        elif self.slash_num > 0:
+            slash_path = "src/tile_sets/tiles_for_chars/slash/slash_" + str(self.slash_num) + ".png"
+            image_of_slash = pygame.image.load(slash_path).convert_alpha()
+            image_of_slash = pygame.transform.scale(
+                image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
+            display.blit(image_of_slash, (self.rect[0] - kSizeOfCharacter // 4, self.rect[1] - kSizeOfCharacter // 4))
+            self.slash_num += 1
+            self.slash_num %= 15
+
+    def update(self, mappa, mini_map, render, rivals=None):
+        self.move(mappa, render)
+        self.melee_attack(rivals)
+        self.ranged_attack()
