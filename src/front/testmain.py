@@ -1,14 +1,9 @@
-import os
+
 import sys
 import pygame
 from src.back import class_map
-from src.back import map_generator
 from src.back.constants_for_map import *
 from src.back.class_minimap import MiniMap
-from src.back.constants_with_paths_to_files import *
-import math
-from src.back.projectile import Projectile
-import time
 from src.back.player import Player
 from src.back.personages import Personage, personages
 

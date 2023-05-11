@@ -4,8 +4,8 @@ from math import sqrt, pi, sin
 kSizeOfCharacter = 48
 kSizeOfProjectile = 32
 
-fireball_path = "../tile_sets/tiles_for_chars/ranged_attack/fireball_animation/sprite_"
-flash_path = "../tile_sets/tiles_for_chars/ranged_attack/flash_animation/flash_"
+fireball_path = "src/tile_sets/tiles_for_chars/ranged_attack/fireball_animation/sprite_"
+flash_path = "src/tile_sets/tiles_for_chars/ranged_attack/flash_animation/flash_"
 
 
 class Projectile:

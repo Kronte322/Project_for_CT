@@ -135,6 +135,7 @@ class MapProcessor:
         spawn_position = random.choice([tile[0] for tile in self.start_room.GetTiles() if tile[1] in [CHAR_FOR_FLOOR]])
         minimap.SetStartPosition((-spawn_position[0], -spawn_position[1]))
         self.current_room = self.start_room
+        return spawn_position[0] * SIZE_OF_TILE, spawn_position[1] * SIZE_OF_TILE
 
     def CanStandThere(self, position):
         return self.map.CanStandThere(position)
@@ -158,6 +159,7 @@ class Map:
     SetTiles()
 
     def __init__(self, size_of_map):
+
         self.matrix_with_map = MapBuilder.GenerateMap(size_of_map)
 
         self.dfs = DFSAlgoForMapBuilder()
@@ -269,8 +271,8 @@ class Map:
     @staticmethod
     def GetLeftUpperCornerForListOfTiles(list_with_tiles):
         left_upper_corner = (
-            min(list_with_tiles, key=lambda item: item[0][0])[0][0] * SIZE_OF_TILE,
-            min(list_with_tiles, key=lambda item: item[0][1])[0][1] * SIZE_OF_TILE)
+            min(list_with_tiles, key=lambda item: item[0][0])[0][0],
+            min(list_with_tiles, key=lambda item: item[0][1])[0][1])
         return left_upper_corner
 
     @staticmethod

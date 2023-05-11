@@ -15,8 +15,8 @@ kSpawnPosition = [kSizeOfDisplay[0] // 2, kSizeOfDisplay[1] // 2]
 
 kOneHeartInHP = 200
 kSizeOfHeart = 24
-path_to_heart = "../tile_sets/tiles_for_chars/hearts/heart_"
-path_to_skeleton = "../tile_sets/tiles_for_chars/personages/skeleton/skeleton_"
+path_to_heart = "src/tile_sets/tiles_for_chars/hearts/heart_"
+path_to_skeleton = "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_"
 
 
 def norm(vector):
@@ -52,6 +52,7 @@ class Player:
             kSizeOfDisplay[1] // 2 + SIZE_OF_MOVE_BOX[1] // 2)
 
         self.rect = self.image_of_character.get_rect(topleft=spawnposition)
+        # self.rect = self.image_of_character.get_rect(topleft=(1920 // 2, 1080 // 2))
         display.blit(self.image_of_character, self.rect)
 
         self.max_speed = 8
@@ -77,7 +78,7 @@ class Player:
         self.left_mouse_down = False  # это либо будет полем игрока, либо глобальгной переменной
         self.left_mouse_up = False  # это либо будет полем игрока, либо глобальгной переменной
 
-        self.staff = Staff("../tile_sets/tiles_for_chars/staff/staff.png", self.rect, display)
+        self.staff = Staff("src/tile_sets/tiles_for_chars/staff/staff.png", self.rect, display)
         self.sin_num = 0
 
         self.path_to_icon = self.personage.path_icon
@@ -89,7 +90,7 @@ class Player:
         return self.image_of_character
 
     def GetPosition(self):
-        return tuple(self.rect.x, self.rect.y)
+        return self.rect.x, self.rect.y
 
     def GetSize(self):
         return self.rect.size
@@ -212,7 +213,7 @@ class Player:
             # self.right_mouse_down = False
             self.last_fire_slash = time.time()
 
-            slash_path = "../tile_sets/tiles_for_chars/slash/slash_0.png"
+            slash_path = "src/tile_sets/tiles_for_chars/slash/slash_0.png"
             image_of_slash = pygame.image.load(slash_path).convert_alpha()
             image_of_slash = pygame.transform.scale(
                 image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
@@ -230,7 +231,7 @@ class Player:
                         pass
 
         elif self.slash_num > 0:
-            slash_path = "../tile_sets/tiles_for_chars/slash/slash_" + str(self.slash_num) + ".png"
+            slash_path = "src/tile_sets/tiles_for_chars/slash/slash_" + str(self.slash_num) + ".png"
             image_of_slash = pygame.image.load(slash_path).convert_alpha()
             image_of_slash = pygame.transform.scale(
                 image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
@@ -278,7 +279,7 @@ class Player:
         display.blit(self.image_of_icon, (26, 10))
 
     def mp_icon(self, display):
-        path_to_mp_icon = "../tile_sets/tiles_for_chars/MP_icon.png"
+        path_to_mp_icon = "src/tile_sets/tiles_for_chars/MP_icon.png"
         width = round(self.magic_points / self.max_magic * 215)
         pygame.draw.rect(display, (20, 160, 255), (93, 47, width, 20))
         image_of_mp_icon = pygame.image.load(path_to_mp_icon).convert_alpha()

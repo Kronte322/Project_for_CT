@@ -31,7 +31,7 @@ class Staff:
         self.image_of_mineral = []
 
         for i in range(self.num_of_minerals):
-            self.path_to_minerals.append("../tile_sets/tiles_for_chars/magic_crystals/red_crystal.png")
+            self.path_to_minerals.append("src/tile_sets/tiles_for_chars/magic_crystals/red_crystal.png")
             self.image_of_mineral.append(pygame.image.load(self.path_to_minerals[i]).convert_alpha())
             self.image_of_mineral[i] = pygame.transform.scale(
                 self.image_of_mineral[i], (8, 8))
