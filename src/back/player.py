@@ -87,6 +87,9 @@ class Player:
     def GetPosition(self):
         return self.rect.x, self.rect.y
 
+    def GetCenterPosition(self):
+        return self.rect.x + kSizeOfCharacter // 2, self.rect.y + kSizeOfCharacter // 2
+
     def GetSize(self):
         return self.rect.size
 
@@ -163,7 +166,7 @@ class Player:
 
         render.ChangePositionOfPlayerAccordingToMoveBox(self.direction)
 
-    def ranged_attack(self):
+    def ranged_attack(self, screen_position):
         self.left_mouse_up = not pygame.mouse.get_pressed()[0]
         if self.left_mouse_up and self.left_mouse_down and self.magic_points >= 5:  # and (time.time()-self.last_fire_time) > 0.3
             mouse = pygame.mouse.get_pos()
