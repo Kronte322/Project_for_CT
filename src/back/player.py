@@ -46,11 +46,6 @@ class Player:
 
         self.image_of_character = self.image_stat.get_image()
 
-        self.moveBox = (
-            kSizeOfDisplay[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, kSizeOfDisplay[1] // 2 - SIZE_OF_MOVE_BOX[1] //
-            2, kSizeOfDisplay[0] // 2 + SIZE_OF_MOVE_BOX[0] // 2,
-            kSizeOfDisplay[1] // 2 + SIZE_OF_MOVE_BOX[1] // 2)
-
         self.rect = self.image_of_character.get_rect(topleft=spawnposition)
         # self.rect = self.image_of_character.get_rect(topleft=(1920 // 2, 1080 // 2))
         display.blit(self.image_of_character, self.rect)
@@ -95,7 +90,7 @@ class Player:
     def GetSize(self):
         return self.rect.size
 
-    def move(self, mappa, mini_map):
+    def move(self, mappa, mini_map, render):
         self.direction = [0, 0]
 
         key = pygame.key.get_pressed()
@@ -151,20 +146,6 @@ class Player:
         self.rect.y += self.direction[1]
         mini_map.MoveMiniMap([-self.direction[0], -self.direction[1]])
 
-        if self.rect.x <= self.moveBox[0] or self.rect.x >= self.moveBox[2] - kSizeOfCharacter:
-            self.rect.x -= self.direction[0]
-            if self.fires:
-                for fire in self.fires:
-                    fire.rect.x -= self.direction[0]
-            mappa.MoveMap([-self.direction[0], 0])
-
-        if self.rect.y <= self.moveBox[1] or self.rect.y >= self.moveBox[3] - kSizeOfCharacter:
-            self.rect.y -= self.direction[1]
-            if self.fires:
-                for fire in self.fires:
-                    fire.rect.y -= self.direction[1]
-            mappa.MoveMap([0, -self.direction[1]])
-
         if self.direction == [0, 0]:
             self.image_of_character = self.image_stat.get_image()
 
@@ -179,6 +160,9 @@ class Player:
 
         elif self.direction[1] < 0:
             self.image_of_character = self.image_up.get_image()
+
+        render.ChangePositionOfPlayerAccordingToMoveBox(self.direction);
+
 
     def ranged_attack(self, display, mappa):
         self.left_mouse_up = not pygame.mouse.get_pressed()[0]
