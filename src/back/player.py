@@ -89,6 +89,7 @@ class Player:
 
     def GetCenterPosition(self):
         return self.rect.x + kSizeOfCharacter // 2, self.rect.y + kSizeOfCharacter // 2
+
     def GetStandPosition(self):
         return self.rect.x + kSizeOfCharacter // 2, self.rect.y + kSizeOfCharacter
 
@@ -126,12 +127,15 @@ class Player:
         self.direction[0] = round(self.direction[0])
         self.direction[1] = round(self.direction[1])
 
-        if self.direction[0] < 0 and not mappa.CanStandThere(
-                (self.rect.x + self.direction[0], self.rect.y + kSizeOfCharacter)):
+        if self.direction[0] < 0 and (not mappa.CanStandThere(
+                (self.rect.x + self.direction[0], self.rect.y + kSizeOfCharacter)) or not mappa.CanStandThere(
+            (self.rect.x + self.direction[0], self.rect.y))):
             self.direction[0] = 0
 
-        elif self.direction[0] > 0 and not mappa.CanStandThere(
-                (self.rect.x + kSizeOfCharacter + self.direction[0], self.rect.y + kSizeOfCharacter)):
+        elif self.direction[0] > 0 and (not mappa.CanStandThere(
+                (self.rect.x + kSizeOfCharacter + self.direction[0],
+                 self.rect.y + kSizeOfCharacter)) or not mappa.CanStandThere((
+                self.rect.x + kSizeOfCharacter + self.direction[0], self.rect.y))):
             self.direction[0] = 0
 
         if self.direction[1] < 0:
