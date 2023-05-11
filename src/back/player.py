@@ -256,8 +256,8 @@ class Player:
             image_of_mp_icon, (240, 24))
         display.blit(image_of_mp_icon, (80, 45))
 
-    def render(self, display, mappa):
-        display.blit(self.image_of_character, self.rect)
+    def render(self, display, mappa, position):
+        display.blit(self.image_of_character, position)
         self.staff.render(display, self.rect)
         # self.ranged_attack(display, mappa)
         # self.melee_attack(display)
@@ -278,7 +278,7 @@ class Player:
             image_of_slash = pygame.image.load(slash_path).convert_alpha()
             image_of_slash = pygame.transform.scale(
                 image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
-            display.blit(image_of_slash, (self.rect[0] - kSizeOfCharacter // 4, self.rect[1] - kSizeOfCharacter // 4))
+            display.blit(image_of_slash, (position[0] - kSizeOfCharacter // 4, position[1] - kSizeOfCharacter // 4))
             self.slash_num += 1
             self.slash_num %= 15
 
