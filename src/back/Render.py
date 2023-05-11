@@ -20,6 +20,9 @@ class Render:
     def Update(self):
         pass
 
+    # def DrawObjects(self):
+    #
+
     def DrawPlayer(self):
         self.player.render(self.display, (1920 // 2, 1080 // 2))
         self.display.blit(self.player.GetImage(), (

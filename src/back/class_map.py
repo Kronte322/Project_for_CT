@@ -154,6 +154,9 @@ class MapProcessor:
         else:
             raise "when close door, current room is not room"
 
+    # def SpawnChest(self):
+    #
+
 
 class Map:
     SetTiles()

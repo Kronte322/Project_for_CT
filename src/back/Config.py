@@ -1,2 +1,3 @@
 FPS = 60
 CHARACTER = 'knight'
+SIZE_OF_BASIC_CHEST = 48
