@@ -282,7 +282,7 @@ class Player:
             self.slash_num += 1
             self.slash_num %= 15
 
-    def update(self, mappa, mini_map, render, rivals=None):
+    def update(self, mappa, render, rivals=None):
         self.move(mappa, render)
         self.melee_attack(rivals)
         self.ranged_attack()
