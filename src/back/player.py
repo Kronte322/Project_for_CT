@@ -136,9 +136,9 @@ class Player:
 
         if self.direction[1] < 0:
             if not mappa.CanStandThere(
-                    (self.rect.x, self.rect.y + self.direction[1])) or not mappa.CanStandThere(
+                    (self.rect.x, self.rect.y + kSizeOfCharacter // 2 + self.direction[1])) or not mappa.CanStandThere(
                 (self.rect.x + kSizeOfCharacter,
-                 self.rect.y + self.direction[1])):
+                 self.rect.y + kSizeOfCharacter // 2 + self.direction[1])):
                 self.direction[1] = 0
         elif self.direction[1] > 0:
             if not mappa.CanStandThere(
