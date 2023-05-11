@@ -41,8 +41,9 @@ class Projectile:
         self.num_of_mineral = num_of_mineral
         self.sin_num = sinnum
 
-    def render(self, display):
-        display.blit(self.image_of_projectile, self.rect)
+    def render(self, display, screen_position, map_position):
+        display.blit(self.image_of_projectile, (
+            self.rect[0] - map_position[0] + screen_position[0], self.rect[1] - map_position[1] + screen_position[1]))
 
     def update(self, mappa, rivals=None):
         is_touch_with_rival = False

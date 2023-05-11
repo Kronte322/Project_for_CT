@@ -270,7 +270,7 @@ class Player:
             self.health_points += self.health_recovery
         if self.fires:
             for (i, fire) in enumerate(self.fires):
-                if fire.render(display):
+                if fire.render(display, position, (self.rect.x, self.rect.y)):
                     self.fires.pop(i)
 
         elif self.slash_num > 0:
