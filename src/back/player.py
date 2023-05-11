@@ -1,10 +1,9 @@
 import pygame
-from src.back.constants_for_map import WINDOW_SIZE, SIZE_OF_MOVE_BOX
-from src.back.constants_with_paths_to_files import PATH_TO_CHARACTER
+from src.back.Config import *
 from src.back.projectile import Projectile
 from src.back.staff import Staff
 from src.back.animation import Animation
-from src.back.personages import Personage, personages
+from src.back.personages import Personage
 import time
 from math import sqrt
 
@@ -95,6 +94,10 @@ class Player:
 
     def GetSize(self):
         return self.rect.size
+
+    def ChangePosition(self, vector):
+        self.rect.x += vector[0]
+        self.rect.y += vector[1]
 
     def move(self, mappa, render):
         self.direction = [0, 0]
@@ -294,7 +297,7 @@ class Player:
     def update(self, mappa, render, rivals=None):
         self.move(mappa, render)
         self.melee_attack(rivals)
-        # self.ranged_attack()
+        self.ranged_attack(render.GetPlayerPositionOnTheScreen())
         if self.fires:
             for (i, fire) in enumerate(self.fires):
                 if fire.update(mappa):

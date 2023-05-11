@@ -1,10 +1,8 @@
 import pygame
-import random
-import time
-from src.back.map_generator import MapBuilder, DFSAlgoForMapBuilder
+
+from src.back.Map.map_generator import *
+from src.back.Map.space import *
 from src.back.constants_with_paths_to_files import *
-from src.back.constants_for_map import *
-from abc import ABC, abstractmethod
 
 random.seed(time.time())
 
@@ -55,109 +53,6 @@ def SetTiles():
         list_with_floor.append(SetImage(PATH_TO_FLOORS, i))
 
 
-class Space(ABC):
-    def __init__(self, tiles, keys):
-        self.tiles = tiles
-        self.keys = keys
-        self.left_upper_corner = Map.GetLeftUpperCornerForListOfTiles(tiles)
-
-    def GetPosition(self):
-        return self.left_upper_corner[0] * SIZE_OF_TILE, self.left_upper_corner[1] * SIZE_OF_TILE
-
-    def GetTiles(self):
-        return self.tiles
-
-    def GetCoordinatesOfTiles(self):
-        return [tile[0] for tile in self.tiles]
-
-    def GetKeys(self):
-        return self.keys
-
-    def GetSizeOfSpace(self):
-        return len(self.tiles)
-
-    @abstractmethod
-    def GetSurface(self):
-        pass
-
-
-class RoomSpace(Space):
-    def __init__(self, tiles, keys, doors):
-        super().__init__(tiles, keys)
-        self.surface = Map.GetSurface(self.tiles)
-        self.doors = doors
-
-    def GetSurface(self):
-        return self.surface
-
-    def GetDoors(self):
-        return self.doors
-
-
-class PathSpace(Space):
-    def __init__(self, tiles, keys):
-        super().__init__(tiles, keys)
-
-    def GetSurface(self):
-        return Map.GetSurface(self.tiles)
-
-
-class MapProcessor:
-    def __init__(self):
-        self.map = None
-        self.start_room = None
-        self.finish_room = None
-        self.current_room = None
-        self.visited_rooms = []
-        self.ConstructMap(SIZE_OF_MAP)
-
-    def GenerateMap(self, size_of_map):
-        self.map = Map(size_of_map)
-
-    def GetCurrentRoom(self):
-        return self.current_room
-
-    def ConstructMap(self, size_of_map):
-        self.GenerateMap(size_of_map)
-        self.start_room = self.map.GetStartRoom()
-        self.finish_room = self.map.GetFinishRoom(self.start_room)
-
-    def GetTilesOfCurrentRoom(self):
-        return self.current_room.GetCoordinatesOfTiles()
-
-    def UpdateCurrentRoom(self, player_position, minimap):
-        self.current_room = self.map.GetCurrentRoom(player_position, self.current_room)
-        if self.current_room not in self.visited_rooms:
-            minimap.BlitOnMiniMap(self.current_room.GetTiles())
-            self.visited_rooms.append(self.current_room)
-
-    def GetSpawnPosition(self, minimap):
-        spawn_position = random.choice([tile[0] for tile in self.start_room.GetTiles() if tile[1] in [CHAR_FOR_FLOOR]])
-        minimap.SetStartPosition((-spawn_position[0], -spawn_position[1]))
-        self.current_room = self.start_room
-        return spawn_position[0] * SIZE_OF_TILE, spawn_position[1] * SIZE_OF_TILE
-
-    def CanStandThere(self, position):
-        return self.map.CanStandThere(position)
-
-    def CloseDoors(self):
-        if isinstance(self.current_room, RoomSpace):
-            walls = [[tile, CHAR_FOR_UP_WALL] for tile in self.current_room.GetDoors()]
-            self.map.SetSpecificTiles(walls)
-        else:
-            raise "when close door, current room is not room"
-
-    def OpenDoors(self):
-        if isinstance(self.current_room, RoomSpace):
-            walls = [[tile, CHAR_FOR_DOOR] for tile in self.current_room.GetDoors()]
-            self.map.SetSpecificTiles(walls)
-        else:
-            raise "when close door, current room is not room"
-
-    # def SpawnChest(self):
-    #
-
-
 class Map:
     SetTiles()
 
@@ -171,6 +66,9 @@ class Map:
         self.spaces = []
 
         self.SetSpaces()
+
+    def GetMatrix(self):
+        return self.matrix_with_map
 
     def GetStartRoom(self):
         result = None
@@ -212,6 +110,7 @@ class Map:
                                                        depth=DEPTH_OF_DFS_FOR_PATHS)
                         keys[(i, j)] = (i, j)
                         used[(i, j)] = (i, j)
+
                         room = PathSpace(intermediate, keys)
                         for key in keys:
                             self.spaces_as_dict[key] = room

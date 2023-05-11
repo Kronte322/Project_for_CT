@@ -1,10 +1,8 @@
 import pygame
-import random
-import time
-from src.back.map_generator import MapBuilder, DFSAlgoForMapBuilder
 from src.back.constants_with_paths_to_files import *
-from src.back.class_map import Map
-from src.back.constants_for_map import *
+from src.back.Map.map import Map
+from src.back.Map.constants_for_map import *
+from src.back.Config import *
 
 
 class MiniMap:

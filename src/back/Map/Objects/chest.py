@@ -7,6 +7,9 @@ class Chest:
         self.list_with_items = []
         self.size_of_chest = size_of_chest
 
+    def GetPosition(self):
+        return self.position_on_the_map
+
     def AddNewItem(self, item):
         self.list_with_items.append(item)
 

@@ -1,11 +1,11 @@
 
 import sys
 import pygame
-from src.back import class_map
-from src.back.constants_for_map import *
-from src.back.class_minimap import MiniMap
+from src.back.Map import map
+from src.back.Map.constants_for_map import *
+from src.back.Map.minimap import MiniMap
 from src.back.player import Player
-from src.back.personages import Personage, personages
+from src.back.personages import personages
 
 
 sys.setrecursionlimit(10000000)

@@ -1,8 +1,10 @@
 import random
 import time
-from src.back.constants_for_map import *
+from src.back.Map.constants_for_map import *
 
 random.seed(time.time())
+
+
 # random.seed(12)
 
 
@@ -20,6 +22,19 @@ class MapBuilder:
         MapBuilder.AdditionalGeneration(result)
         MapBuilder.PostProcessing(result)
         return result
+
+    @staticmethod
+    def GetSideOfDoor(main_matrix, position):
+        if main_matrix[position[0]][position[1]] in SET_WITH_DOORS:
+            if main_matrix[position[0]][position[1] - 1] is CHAR_FOR_PATH:
+                return 'D'
+            elif main_matrix[position[0]][position[1] + 1] is CHAR_FOR_PATH:
+                return 'U'
+            elif main_matrix[position[0] - 1][position[1]] is CHAR_FOR_PATH:
+                return 'R'
+            elif main_matrix[position[0] + 1][position[1]] is CHAR_FOR_PATH:
+                return 'L'
+
 
     @staticmethod
     def IsItWallForDoor(main_matrix, position: tuple):
@@ -251,16 +266,6 @@ class MapBuilder:
             return MapBuilder.GetDownAround(main_matrix, position)
         if position[1] < parent[1]:
             return MapBuilder.GetUpAround(main_matrix, position)
-
-    def WhatSideMyParent(self, position, parent):
-        if position[0] > parent[0]:
-            return 'R'
-        if position[0] < parent[0]:
-            return 'L'
-        if position[1] > parent[1]:
-            return 'D'
-        if position[1] < parent[1]:
-            return 'U'
 
     @staticmethod
     def NumOfTiles(main_matrix, list_of_tiles, position):
@@ -753,9 +758,10 @@ class MapBuilder:
     @staticmethod
     def IsItRightUpCorner(main_matrix, position):
         return MapBuilder.GetTile(main_matrix, position) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (
-        position[0], position[1] + 1)) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (
-        position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
-                                                                                (position[0] - 1, position[1] + 1)) in [
+            position[0], position[1] + 1)) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix, (
+            position[0] - 1, position[1])) in SET_WITH_WALLS and MapBuilder.GetTile(main_matrix,
+                                                                                    (position[0] - 1,
+                                                                                     position[1] + 1)) in [
             CHAR_FOR_FLOOR]
 
     @staticmethod
@@ -984,11 +990,6 @@ class DFSAlgoForMapBuilder:
                                 (j[0] - 2, j[1])) is not None or self.used.get((j[0] + 2, j[1])) is not None:
                                 if self.parents.get(vertex)[0] == j[0] or self.parents.get(vertex)[1] == j[1]:
                                     main_matrix[j[0]][j[1]] = CHAR_FOR_POTENTIAL_DOOR
-                                    # if self.counter_for_doors % self.freq_of_doors == 0:
-                                    #     self.counter_for_doors = 1
-                                    #     self.RandFreq()
-                                    #     self.map.main_matrix[j[0]][j[1]] = kDoor
-                                    # self.counter_for_doors += 1
                     if j == self.parents.get(vertex):
                         continue
 
@@ -1070,7 +1071,7 @@ class DFSAlgoForMapBuilder:
                 if flag == 'room':
                     if MapBuilder.GetTile(main_matrix, i) in [CHAR_FOR_DOOR]:
                         keys[0][vertex] = vertex
-                        keys[1][vertex] = vertex
+                        keys[1][i] = i
                 if self.used.get(i) is None and i != self.parents.get(vertex):
                     self.parents[i] = vertex
                     self.RecursiveDFSOnTheSpecific(main_matrix, i, final_matrix, tiles, current_depth=current_depth + 1,

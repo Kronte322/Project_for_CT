@@ -25,4 +25,4 @@ PATH_TO_DEFINITELY_CLOSED_UP_DOOR = "src/tile_sets/tiles_for_map/doors/up_doors/
 PATH_TO_CLOSED_DOWN_DOOR = "src/tile_sets/tiles_for_map/doors/down_doors/sprite_0.png"
 PATH_TO_DEFINITELY_DOWN_UP_DOOR = "src/tile_sets/tiles_for_map/doors/down_doors/sprite_1.png"
 
-PATH_TO_BASIC_CHEST = "src/tile_sets/tiles_for_map/doors/chest_and_other/sprite_084.png"
+PATH_TO_BASIC_CHEST = "src/tile_sets/tiles_for_map/chests_and_other/sprite_084.png"
