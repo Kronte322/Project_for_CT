@@ -89,7 +89,7 @@ class Player:
         return self.image_of_character
 
     def GetPosition(self):
-        return tuple(self.rect.x, self.rect.y)
+        return (self.rect.x, self.rect.y)
 
     def GetSize(self):
         return self.rect.size
