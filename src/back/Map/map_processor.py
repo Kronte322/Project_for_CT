@@ -15,6 +15,9 @@ class MapProcessor:
         self.objects = []
         self.ConstructMap(SIZE_OF_MAP)
 
+    def RedrawCurrentRoom(self):
+        self.current_room.RedrawDoors(self.map.GetMatrix())
+
     def GetObjects(self):
         return self.objects
 
@@ -55,8 +58,9 @@ class MapProcessor:
 
     def CloseDoors(self):
         if isinstance(self.current_room, RoomSpace):
-            walls = [[tile, CHAR_FOR_UP_WALL] for tile in self.current_room.GetDoors()]
+            walls = [[tile, CHAR_FOR_CLOSED_DOOR] for tile in self.current_room.GetDoors()]
             self.map.SetSpecificTiles(walls)
+            self.RedrawCurrentRoom()
         else:
             raise "when close door, current room is not room"
 
@@ -64,6 +68,7 @@ class MapProcessor:
         if isinstance(self.current_room, RoomSpace):
             walls = [[tile, CHAR_FOR_DOOR] for tile in self.current_room.GetDoors()]
             self.map.SetSpecificTiles(walls)
+            self.RedrawCurrentRoom()
         else:
             raise "when close door, current room is not room"
 

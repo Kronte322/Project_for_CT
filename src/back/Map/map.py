@@ -24,6 +24,8 @@ image_for_right_down_in_corner = pygame.image.load(PATH_TO_RIGHT_DOWN_IN_CORNER)
 
 image_for_right_down_out_corner = pygame.image.load(PATH_TO_RIGHT_DOWN_OUT_CORNER)
 
+image_for_closed_door = pygame.image.load(PATH_TO_DEFINITELY_CLOSED_UP_DOOR)
+
 generated_floor = {}
 
 
@@ -156,6 +158,8 @@ class Map:
             surface.blit(ScaleImage(image_for_right_down_in_corner, size_of_tile), position_for_blit)
         elif tile[1] == CHAR_FOR_DOWN_OUT_CORNER:
             surface.blit(ScaleImage(image_for_right_down_out_corner, size_of_tile), position_for_blit)
+        elif tile[1] == CHAR_FOR_CLOSED_DOOR:
+            surface.blit(ScaleImage(image_for_closed_door, size_of_tile), position_for_blit)
         else:
             surface.blit(ScaleImage(image_for_empty, size_of_tile), position_for_blit)
 

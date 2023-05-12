@@ -52,7 +52,7 @@ class CharacterSelectionMenu(Menu):
         def SetCharacter(key, value):
             character_selection_process.SetCharacter(value)
 
-        SetCharacter(1, Config.CHARACTERS[1][1])
+        SetCharacter(1, Config.CHARACTERS[0][1])
 
         self.menu.add.selector(title=Config.CHARACTER_SELECTION_STRING, items=Config.CHARACTERS,
                                onchange=SetCharacter)

@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 import src.back.Map.map
 from src.back.Map.constants_for_map import *
+import copy
 
 
 class Space(ABC):
@@ -52,6 +53,14 @@ class RoomSpace(Space):
 
     def GetDoors(self):
         return self.doors
+
+    def RedrawDoors(self, main_matrix):
+        for i in range(len(self.tiles)):
+            cop = self.doors.copy()
+            if self.tiles[i][0] in cop:
+                self.tiles[i] = (self.tiles[i][0], main_matrix[self.tiles[i][0][0]][self.tiles[i][0][1]])
+                self.doors[self.tiles[i][0]] = main_matrix[self.tiles[i][0][0]][self.tiles[i][0][1]]
+        self.surface = src.back.Map.map.Map.GetSurface(self.tiles)
 
 
 class PathSpace(Space):
