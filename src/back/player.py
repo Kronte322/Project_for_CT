@@ -130,22 +130,19 @@ class Player:
         self.direction[0] = round(self.direction[0])
         self.direction[1] = round(self.direction[1])
 
-        if self.direction[0] < 0 and (not mappa.CanStandThere(
-                (self.rect.x + self.direction[0], self.rect.y + kSizeOfCharacter)) or not mappa.CanStandThere(
-            (self.rect.x + self.direction[0], self.rect.y))):
+        if self.direction[0] < 0 and not mappa.CanStandThere(
+                (self.rect.x + self.direction[0], self.rect.y + kSizeOfCharacter)):
             self.direction[0] = 0
 
-        elif self.direction[0] > 0 and (not mappa.CanStandThere(
-                (self.rect.x + kSizeOfCharacter + self.direction[0],
-                 self.rect.y + kSizeOfCharacter)) or not mappa.CanStandThere((
-                self.rect.x + kSizeOfCharacter + self.direction[0], self.rect.y))):
+        elif self.direction[0] > 0 and not mappa.CanStandThere(
+                (self.rect.x + kSizeOfCharacter + self.direction[0], self.rect.y + kSizeOfCharacter)):
             self.direction[0] = 0
 
         if self.direction[1] < 0:
             if not mappa.CanStandThere(
-                    (self.rect.x, self.rect.y + kSizeOfCharacter // 2 + self.direction[1])) or not mappa.CanStandThere(
+                    (self.rect.x, self.rect.y + kSizeOfCharacter - 8 + self.direction[1])) or not mappa.CanStandThere(
                 (self.rect.x + kSizeOfCharacter,
-                 self.rect.y + kSizeOfCharacter // 2 + self.direction[1])):
+                 self.rect.y + kSizeOfCharacter - 8 + self.direction[1])):
                 self.direction[1] = 0
         elif self.direction[1] > 0:
             if not mappa.CanStandThere(
