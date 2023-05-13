@@ -80,6 +80,9 @@ class Player:
         self.image_of_icon = pygame.transform.scale(
             self.image_of_icon, (kSizeOfCharacter, kSizeOfCharacter))
 
+    def GetPersonage(self):
+        return self.personage
+
     def GetImage(self):
         return self.image_of_character
 

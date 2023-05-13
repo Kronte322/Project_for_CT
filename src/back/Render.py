@@ -1,6 +1,6 @@
 import pygame
 
-from src.back.Map.Objects.chest import *
+from src.back.Map.Objects.map_objects import *
 from src.back.constants_with_paths_to_files import *
 
 
@@ -19,10 +19,14 @@ class Render:
     def GetPlayerPositionOnTheScreen(self):
         return self.position_of_player_on_the_screen
 
+    def SetImage(self, tp, path, size):
+        image = pygame.image.load(path)
+        image = pygame.transform.scale(image, (size, size))
+        self.images[tp] = image
+
     def SetImages(self):
-        image_for_chest = pygame.image.load(PATH_TO_BASIC_CHEST)
-        image_for_chest = pygame.transform.scale(image_for_chest, (SIZE_OF_BASIC_CHEST, SIZE_OF_BASIC_CHEST))
-        self.images[BasicChest] = image_for_chest
+        self.SetImage(BasicChest, PATH_TO_BASIC_CHEST, SIZE_OF_BASIC_CHEST)
+        self.SetImage(Exit, PATH_TO_EXIT, SIZE_OF_TILE)
 
     def ChangePositionOfPlayerAccordingToMoveBox(self, vector):
         self.mini_map.MoveMiniMap((-vector[0], -vector[1]))
@@ -39,10 +43,9 @@ class Render:
     def DrawMapObjects(self):
         for obj in self.map_processor.GetObjects():
             if self.map_processor.IsInCurrentRoom(obj.GetPosition()):
-                position_to_blit = (obj.GetPosition()[0] - self.player.GetPosition()[0] +
-                                    self.position_of_player_on_the_screen[0],
-                                    obj.GetPosition()[1] - self.player.GetPosition()[1] +
-                                    self.position_of_player_on_the_screen[1])
+                position_to_blit = (
+                    obj.GetPosition()[0] - self.player.GetPosition()[0] + self.position_of_player_on_the_screen[0],
+                    obj.GetPosition()[1] - self.player.GetPosition()[1] + self.position_of_player_on_the_screen[1])
                 self.display.blit(self.images[type(obj)], position_to_blit)
 
     def DrawMiniMap(self):

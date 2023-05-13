@@ -1,8 +1,12 @@
 from src.back.personages import *
 
+RUNNING = True
+
 FPS = 60
 CHARACTER = 'knight'
 SIZE_OF_BASIC_CHEST = 48
+
+DISTANCE_OF_ACTION = 100
 
 SIZE_OF_MOVE_BOX = [600, 300]
 WINDOW_SIZE = [1920, 1000]
@@ -47,3 +51,4 @@ LOAD_STRING = 'Load'
 CHOOSE_FILE_STRING = 'Choose file:'
 PICK_SERVER_STRING = 'Pick a server'
 CONNECT_BUTTON_STRING = 'Connect'
+

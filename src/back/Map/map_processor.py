@@ -1,4 +1,4 @@
-from src.back.Map.Objects.chest import *
+from src.back.Map.Objects.map_objects import *
 from src.back.Map.map import Map
 from src.back.Map.space import *
 from src.back.Map.map_generator import MapBuilder
@@ -40,6 +40,14 @@ class MapProcessor:
         self.GenerateMap(size_of_map)
         self.start_room = self.map.GetStartRoom()
         self.finish_room = self.map.GetFinishRoom(self.start_room)
+
+    def GenerateExit(self):
+        list_with_tiles = self.finish_room.GetCoordinatesOfTiles()
+        while True:
+            coord = random.choice(list_with_tiles)
+            if self.finish_room.GetTile(coord) in [CHAR_FOR_FLOOR]:
+                self.AddObject(Exit((coord[0] * SIZE_OF_TILE, coord[1] * SIZE_OF_TILE)))
+                break
 
     def GetTilesOfCurrentRoom(self):
         return self.current_room.GetCoordinatesOfTiles()
