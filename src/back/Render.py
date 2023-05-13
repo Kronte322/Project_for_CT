@@ -38,7 +38,7 @@ class Render:
 
     def DrawMapObjects(self):
         for obj in self.map_processor.GetObjects():
-            if self.map_processor.GetCurrentRoom().IsThere(obj.GetPosition()):
+            if self.map_processor.IsInCurrentRoom(obj.GetPosition()):
                 position_to_blit = (obj.GetPosition()[0] - self.player.GetPosition()[0] +
                                     self.position_of_player_on_the_screen[0],
                                     obj.GetPosition()[1] - self.player.GetPosition()[1] +

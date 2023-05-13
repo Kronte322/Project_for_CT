@@ -21,6 +21,9 @@ class MapProcessor:
     def GetObjects(self):
         return self.objects
 
+    def IsInCurrentRoom(self, position):
+        return self.current_room.IsThere(position)
+
     def GetSideOfDoor(self, position):
         return MapBuilder.GetSideOfDoor(self.map.GetMatrix(), self.map.GetPositionOfTile(position))
 
