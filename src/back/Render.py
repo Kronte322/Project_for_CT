@@ -2,15 +2,16 @@ import pygame
 
 from src.back.Map.Objects.map_objects import *
 from src.back.constants_with_paths_to_files import *
+from src.back.enemy import *
 
 
 class Render:
-    def __init__(self, display, player, enemy, map_processor, mini_map):
+    def __init__(self, display, player, map_processor, mini_map, enemies_processor):
         self.display = display
         self.player = player
-        self.enemy = enemy
         self.mini_map = mini_map
         self.map_processor = map_processor
+        self.enemies_processor = enemies_processor
         self.position_of_player_on_the_screen = POSITION_OF_PLAYER_ON_SCREEN
         self.position_of_enemy_on_the_screen = POSITION_OF_ENEMY_ON_SCREEN
         self.moveBox = (WINDOW_SIZE[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, WINDOW_SIZE[1] // 2 - SIZE_OF_MOVE_BOX[1] // 2,
@@ -29,6 +30,7 @@ class Render:
     def SetImages(self):
         self.SetImage(BasicChest, PATH_TO_BASIC_CHEST, SIZE_OF_BASIC_CHEST)
         self.SetImage(Exit, PATH_TO_EXIT, SIZE_OF_TILE)
+        self.SetImage(RangeSkeleton, PATH_TO_SKELETON, SIZE_OF_SKELETON)
 
     def ChangePositionOfPlayerAccordingToMoveBox(self, vector):
         self.mini_map.MoveMiniMap((-vector[0], -vector[1]))
@@ -45,25 +47,29 @@ class Render:
     def DrawMapObjects(self):
         for obj in self.map_processor.GetObjects():
             if self.map_processor.IsInCurrentRoom(obj.GetPosition()):
-                position_to_blit = (
-                    obj.GetPosition()[0] - self.player.GetPosition()[0] + self.position_of_player_on_the_screen[0],
-                    obj.GetPosition()[1] - self.player.GetPosition()[1] + self.position_of_player_on_the_screen[1])
-                self.display.blit(self.images[type(obj)], position_to_blit)
+                self.display.blit(self.images[type(obj)], self.GetPositionToBlit(obj.GetPosition()))
 
     def DrawMiniMap(self):
         self.mini_map.RenderMiniMap(self.display)
 
+    def GetPositionToBlit(self, position):
+        return (position[0] - self.player.GetPosition()[0] + self.position_of_player_on_the_screen[0],
+                position[1] - self.player.GetPosition()[1] + self.position_of_player_on_the_screen[1])
+
     def DrawMap(self):
-        position_to_blit = (self.map_processor.GetCurrentRoom().GetPosition()[0] - self.player.GetPosition()[0] +
-                            self.position_of_player_on_the_screen[0],
-                            self.map_processor.GetCurrentRoom().GetPosition()[1] - self.player.GetPosition()[1] +
-                            self.position_of_player_on_the_screen[1])
-        self.display.blit(self.map_processor.GetCurrentRoom().GetSurface(), position_to_blit)
+        self.display.blit(self.map_processor.GetCurrentRoom().GetSurface(),
+                          self.GetPositionToBlit(self.map_processor.GetCurrentRoom().GetPosition()))
+
+    def DrawEnemies(self):
+        for enemy in self.enemies_processor.GetEnemies():
+            if self.map_processor.IsInCurrentRoom(enemy.GetPosition()):
+                self.display.blit(self.images[type(enemy)], self.GetPositionToBlit(enemy.GetPosition()))
 
     def Draw(self):
         self.display.fill((37, 19, 26))
         self.DrawMap()
         self.DrawMapObjects()
+        self.DrawEnemies()
         self.DrawPlayer()
         self.DrawMiniMap()
         pygame.display.flip()

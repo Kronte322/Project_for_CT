@@ -65,7 +65,7 @@ class MapProcessor:
         return spawn_position[0] * SIZE_OF_TILE, spawn_position[1] * SIZE_OF_TILE
 
     def CanStandThere(self, position):
-        return self.map.CanStandThere(position)
+        return self.map.CanStandThere([int(position[0]), int(position[1])])
 
     def CloseDoors(self):
         if isinstance(self.current_room, RoomSpace):

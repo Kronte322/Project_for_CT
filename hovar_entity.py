@@ -1,20 +1,9 @@
-import pygame
 # import constants_for_map
-from random import randint, random
-import os
-import sys
-import pygame
-import pygame
-from src.back.Config import *
-from src.back.projectile import Projectile
-from src.back.staff import Staff
-from src.back.animation import Animation
-from src.back.personages import Personage
-import time
-from math import sqrt
 import math
-from src.back.player import *
+import random
+
 from src.back.constants_with_paths_to_files import PATH_TO_ENEMY
+from src.back.player import *
 
 kSizeOfCharacter = 48
 kSize_of_enemy = 48
@@ -62,6 +51,7 @@ class Enemy:
         self.direction = [0, 0]
         dx, dy = player_pos[0] - self.x, player_pos[1] - self.y
         distance = math.sqrt(dx ** 2 + dy ** 2)
+        velocity = None
 
         if distance != 0:
             # вычисляем вектор направления движения
@@ -92,5 +82,6 @@ class Enemy:
                 self.direction[0] = 0
         self.x += velocity[0]
         self.y += velocity[1]
+
     def render(self, display):
         display.blit(self.image, (self.x, self.y))
