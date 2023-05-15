@@ -5,12 +5,14 @@ from src.back.constants_with_paths_to_files import *
 
 
 class Render:
-    def __init__(self, display, player, map_processor, mini_map):
+    def __init__(self, display, player, enemy, map_processor, mini_map):
         self.display = display
         self.player = player
+        self.enemy = enemy
         self.mini_map = mini_map
         self.map_processor = map_processor
         self.position_of_player_on_the_screen = POSITION_OF_PLAYER_ON_SCREEN
+        self.position_of_enemy_on_the_screen = POSITION_OF_ENEMY_ON_SCREEN
         self.moveBox = (WINDOW_SIZE[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, WINDOW_SIZE[1] // 2 - SIZE_OF_MOVE_BOX[1] // 2,
                         WINDOW_SIZE[0] // 2 + SIZE_OF_MOVE_BOX[0] // 2, WINDOW_SIZE[1] // 2 + SIZE_OF_MOVE_BOX[1] // 2)
         self.images = {}

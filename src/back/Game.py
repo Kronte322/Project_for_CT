@@ -7,6 +7,7 @@ from src.back.Render import Render
 from src.back.Window import Window
 from src.back.in_game_eventor import Eventor
 from src.back.player import Player
+from src.back.entity import Enemy
 from src.back.processes import OnStartProcess
 from src.back.input_processor import *
 
@@ -22,7 +23,8 @@ class Game:
         map_processor = MapProcessor()
         mini_map = MiniMap()
         player = Player(self.window.GetDisplay(), character, map_processor.GetSpawnPosition(mini_map))
-        render = Render(self.window.GetDisplay(), player, map_processor, mini_map)
+        enemy = Enemy()
+        render = Render(self.window.GetDisplay(), player, enemy, map_processor, mini_map)
         clock = pygame.time.Clock()
         map_processor.SpawnChestInCurrentRoom()
         in_game_eventor = Eventor(player, map_processor, mini_map)
@@ -36,5 +38,7 @@ class Game:
             mouse_processor.Update()
             in_game_eventor.Update()
             player.update(map_processor, render)
+            enemy.update(map_processor, render)
             map_processor.UpdateCurrentRoom(player.GetStandPosition(), mini_map)
+            enemy
             render.Draw()

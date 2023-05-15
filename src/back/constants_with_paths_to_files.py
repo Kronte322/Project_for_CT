@@ -27,3 +27,5 @@ PATH_TO_DEFINITELY_DOWN_UP_DOOR = "src/tile_sets/tiles_for_map/doors/down_doors/
 
 PATH_TO_BASIC_CHEST = "src/tile_sets/tiles_for_map/chests_and_other/sprite_084.png"
 PATH_TO_EXIT = "src/tile_sets/tiles_for_map/exit/sprite_038.png"
+
+PATH_TO_ENEMY = "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_0.png"
