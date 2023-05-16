@@ -278,7 +278,7 @@ class Player:
             image_of_mp_icon, (240, 24))
         display.blit(image_of_mp_icon, (80, 45))
 
-    def render(self, display, position):
+    def render(self, display, position, mappa):
         display.blit(self.image_of_character, position)
         self.staff.render(display, pygame.Rect(position[0], position[1], kSizeOfCharacter, kSizeOfCharacter))
         # self.ranged_attack(display, mappa)
@@ -292,7 +292,7 @@ class Player:
             self.health_points += self.health_recovery
         if self.fires:
             for (i, fire) in enumerate(self.fires):
-                if fire.render(display, position, (self.rect.x, self.rect.y)):
+                if fire.render(display, position, (self.rect.x, self.rect.y), mappa):
                     self.fires.pop(i)
 
         elif self.slash_num > 0:

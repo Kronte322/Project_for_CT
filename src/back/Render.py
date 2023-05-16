@@ -43,7 +43,7 @@ class Render:
         pass
 
     def DrawPlayer(self):
-        self.player.render(self.display, self.position_of_player_on_the_screen)
+        self.player.render(self.display, self.position_of_player_on_the_screen, self.map_processor)
 
     def DrawMapObjects(self):
         for obj in self.map_processor.GetObjects():
