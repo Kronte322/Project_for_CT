@@ -34,6 +34,8 @@ class Player:
         self.personage = personage
         self.image_stat = Animation(self.personage.path_stat, self.personage.num_stat,
                                     (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
+        self.image_stat_left = Animation(self.personage.path_stat_left, self.personage.num_stat,
+                                         (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
         self.image_down = Animation(self.personage.path_down, self.personage.num_down,
                                     (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
         self.image_up = Animation(self.personage.path_up, self.personage.num_up,
@@ -42,6 +44,7 @@ class Player:
                                      (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
         self.image_left = Animation(self.personage.path_left, self.personage.num_left,
                                     (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
+        self.last_move_was_left = False
 
         self.image_of_character = self.image_stat.get_image()
 
@@ -159,13 +162,18 @@ class Player:
         # mini_map.MoveMiniMap([-self.direction[0], -self.direction[1]])
 
         if self.direction == [0, 0]:
-            self.image_of_character = self.image_stat.get_image()
+            if self.last_move_was_left:
+                self.image_of_character = self.image_stat_left.get_image()
+            else:
+                self.image_of_character = self.image_stat.get_image()
 
         elif self.direction[0] > 0:
             self.image_of_character = self.image_right.get_image()
+            self.last_move_was_left = False
 
         elif self.direction[0] < 0:
             self.image_of_character = self.image_left.get_image()
+            self.last_move_was_left = True
 
         elif self.direction[1] > 0:
             self.image_of_character = self.image_down.get_image()

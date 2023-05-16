@@ -60,10 +60,6 @@ class Inventory:
         except KeyError:
             return -1
 
-    # def set_image(self):
-    #     for name, resource in self.resources.items():
-    #         resource.set_image()
-
     def increase(self, name):
         try:
             self.resources[name].amount += 1

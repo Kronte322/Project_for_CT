@@ -1,7 +1,9 @@
 class Personage:
-    def __init__(self, path_stat, num_stat, path_down, num_down, path_up, num_up, path_right, num_right, path_left,
+    def __init__(self, path_stat, path_stat_left, num_stat, path_down, num_down, path_up, num_up, path_right, num_right,
+                 path_left,
                  num_left, path_icon, name, recom_freq=3):
         self.path_stat = path_stat
+        self.path_stat_left = path_stat_left
         self.num_stat = num_stat
         self.path_down = path_down
         self.num_down = num_down
@@ -18,7 +20,8 @@ class Personage:
 
 personages = []
 
-skeleton = Personage("src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_down/sprite_", 1,
+skeleton = Personage("src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_down/sprite_",
+                     "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_down/sprite_", 1,
                      "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_down/sprite_", 9,
                      "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_up/sprite_", 9,
                      "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_right/sprite_", 9,
@@ -27,7 +30,8 @@ skeleton = Personage("src/tile_sets/tiles_for_chars/personages/skeleton/skeleton
 
 personages.append(skeleton)
 
-hooded_protogonist = Personage("src/tile_sets/tiles_for_chars/personages/hooded_protogonist/stat/sprite_", 4,
+hooded_protogonist = Personage("src/tile_sets/tiles_for_chars/personages/hooded_protogonist/stat/sprite_",
+                               "src/tile_sets/tiles_for_chars/personages/hooded_protogonist/stat_left/sprite_", 4,
                                "src/tile_sets/tiles_for_chars/personages/hooded_protogonist/down/sprite_", 4,
                                "src/tile_sets/tiles_for_chars/personages/hooded_protogonist/up/sprite_", 4,
                                "src/tile_sets/tiles_for_chars/personages/hooded_protogonist/right/sprite_", 8,
@@ -37,7 +41,8 @@ hooded_protogonist = Personage("src/tile_sets/tiles_for_chars/personages/hooded_
 
 personages.append(hooded_protogonist)
 
-wizard = Personage("src/tile_sets/tiles_for_chars/personages/wizard/stat/sprite_", 8,
+wizard = Personage("src/tile_sets/tiles_for_chars/personages/wizard/stat/sprite_",
+                   "src/tile_sets/tiles_for_chars/personages/wizard/stat_left/sprite_", 8,
                    "src/tile_sets/tiles_for_chars/personages/wizard/right/sprite_", 7,
                    "src/tile_sets/tiles_for_chars/personages/wizard/left/sprite_", 7,
                    "src/tile_sets/tiles_for_chars/personages/wizard/right/sprite_", 7,
@@ -46,7 +51,8 @@ wizard = Personage("src/tile_sets/tiles_for_chars/personages/wizard/stat/sprite_
 
 personages.append(wizard)
 
-knight = Personage("src/tile_sets/tiles_for_chars/personages/knight/stat/sprite_", 15,
+knight = Personage("src/tile_sets/tiles_for_chars/personages/knight/stat/sprite_",
+                   "src/tile_sets/tiles_for_chars/personages/knight/stat_left/sprite_", 15,
                    "src/tile_sets/tiles_for_chars/personages/knight/right/sprite_", 8,
                    "src/tile_sets/tiles_for_chars/personages/knight/left/sprite_", 8,
                    "src/tile_sets/tiles_for_chars/personages/knight/right/sprite_", 8,
@@ -55,7 +61,8 @@ knight = Personage("src/tile_sets/tiles_for_chars/personages/knight/stat/sprite_
 
 personages.append(knight)
 
-magic_wizard = Personage("src/tile_sets/tiles_for_chars/personages/magic_wizard/stat/sprite_", 6,
+magic_wizard = Personage("src/tile_sets/tiles_for_chars/personages/magic_wizard/stat/sprite_",
+                         "src/tile_sets/tiles_for_chars/personages/magic_wizard/stat_left/sprite_", 6,
                          "src/tile_sets/tiles_for_chars/personages/magic_wizard/down/sprite_", 8,
                          "src/tile_sets/tiles_for_chars/personages/magic_wizard/up/sprite_", 10,
                          "src/tile_sets/tiles_for_chars/personages/magic_wizard/right/sprite_", 6,
@@ -65,7 +72,8 @@ magic_wizard = Personage("src/tile_sets/tiles_for_chars/personages/magic_wizard/
 
 personages.append(magic_wizard)
 
-fantasy_warior = Personage("src/tile_sets/tiles_for_chars/personages/fantasy_warior/stat/sprite_", 10,
+fantasy_warior = Personage("src/tile_sets/tiles_for_chars/personages/fantasy_warior/stat/sprite_",
+                           "src/tile_sets/tiles_for_chars/personages/fantasy_warior/stat_left/sprite_", 10,
                            "src/tile_sets/tiles_for_chars/personages/fantasy_warior/right/sprite_", 8,
                            "src/tile_sets/tiles_for_chars/personages/fantasy_warior/left/sprite_", 8,
                            "src/tile_sets/tiles_for_chars/personages/fantasy_warior/right/sprite_", 8,
@@ -75,7 +83,8 @@ fantasy_warior = Personage("src/tile_sets/tiles_for_chars/personages/fantasy_war
 
 personages.append(fantasy_warior)
 
-huntress = Personage("src/tile_sets/tiles_for_chars/personages/huntress/stat/sprite_", 7,
+huntress = Personage("src/tile_sets/tiles_for_chars/personages/huntress/stat/sprite_",
+                     "src/tile_sets/tiles_for_chars/personages/huntress/stat_left/sprite_", 7,
                      "src/tile_sets/tiles_for_chars/personages/huntress/right/sprite_", 7,
                      "src/tile_sets/tiles_for_chars/personages/huntress/left/sprite_", 7,
                      "src/tile_sets/tiles_for_chars/personages/huntress/right/sprite_", 7,
@@ -85,7 +94,8 @@ huntress = Personage("src/tile_sets/tiles_for_chars/personages/huntress/stat/spr
 
 personages.append(huntress)
 
-warior = Personage("src/tile_sets/tiles_for_chars/personages/warior/stat/sprite_", 4,
+warior = Personage("src/tile_sets/tiles_for_chars/personages/warior/stat/sprite_",
+                   "src/tile_sets/tiles_for_chars/personages/warior/stat_left/sprite_", 4,
                    "src/tile_sets/tiles_for_chars/personages/warior/right/sprite_", 6,
                    "src/tile_sets/tiles_for_chars/personages/warior/left/sprite_", 6,
                    "src/tile_sets/tiles_for_chars/personages/warior/right/sprite_", 6,
@@ -95,7 +105,8 @@ warior = Personage("src/tile_sets/tiles_for_chars/personages/warior/stat/sprite_
 
 personages.append(warior)
 
-king = Personage("src/tile_sets/tiles_for_chars/personages/king/stat/sprite_", 8,
+king = Personage("src/tile_sets/tiles_for_chars/personages/king/stat/sprite_",
+                 "src/tile_sets/tiles_for_chars/personages/king/stat_left/sprite_", 8,
                  "src/tile_sets/tiles_for_chars/personages/king/right/sprite_", 8,
                  "src/tile_sets/tiles_for_chars/personages/king/left/sprite_", 8,
                  "src/tile_sets/tiles_for_chars/personages/king/right/sprite_", 8,
@@ -105,7 +116,8 @@ king = Personage("src/tile_sets/tiles_for_chars/personages/king/stat/sprite_", 8
 
 personages.append(king)
 
-skeleton_warior = Personage("src/tile_sets/tiles_for_chars/personages/skeleton_warior/stat/sprite_", 4,
+skeleton_warior = Personage("src/tile_sets/tiles_for_chars/personages/skeleton_warior/stat/sprite_",
+                            "src/tile_sets/tiles_for_chars/personages/skeleton_warior/stat_left/sprite_", 4,
                             "src/tile_sets/tiles_for_chars/personages/skeleton_warior/right/sprite_", 4,
                             "src/tile_sets/tiles_for_chars/personages/skeleton_warior/left/sprite_", 4,
                             "src/tile_sets/tiles_for_chars/personages/skeleton_warior/right/sprite_", 4,
@@ -115,17 +127,20 @@ skeleton_warior = Personage("src/tile_sets/tiles_for_chars/personages/skeleton_w
 
 personages.append(skeleton_warior)
 
-goblin = Personage("src/tile_sets/tiles_for_chars/personages/goblin/stat/sprite_", 4,
-                   "src/tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
-                   "src/tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
-                   "src/tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
-                   "src/tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
-                   "src/tile_sets/tiles_for_chars/personages/goblin/goblin.png",
-                   "goblin", 6)
+goblin = Personage(
+    "src/tile_sets/tiles_for_chars/personages/goblin/stat/sprite_",
+    "src/tile_sets/tiles_for_chars/personages/goblin/stat_left/sprite_", 4,
+    "src/tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
+    "src/tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
+    "src/tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
+    "src/tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
+    "src/tile_sets/tiles_for_chars/personages/goblin/goblin.png",
+    "goblin", 6)
 
 personages.append(goblin)
 
-mushroom = Personage("src/tile_sets/tiles_for_chars/personages/mushroom/stat/sprite_", 4,
+mushroom = Personage("src/tile_sets/tiles_for_chars/personages/mushroom/stat/sprite_",
+                     "src/tile_sets/tiles_for_chars/personages/mushroom/stat_left/sprite_", 4,
                      "src/tile_sets/tiles_for_chars/personages/mushroom/right/sprite_", 8,
                      "src/tile_sets/tiles_for_chars/personages/mushroom/left/sprite_", 8,
                      "src/tile_sets/tiles_for_chars/personages/mushroom/right/sprite_", 8,
@@ -135,7 +150,8 @@ mushroom = Personage("src/tile_sets/tiles_for_chars/personages/mushroom/stat/spr
 
 personages.append(mushroom)
 
-flying_eye = Personage("src/tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,
+flying_eye = Personage("src/tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_",
+                       "src/tile_sets/tiles_for_chars/personages/flying_eye/left/sprite_", 7,
                        "src/tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,
                        "src/tile_sets/tiles_for_chars/personages/flying_eye/left/sprite_", 7,
                        "src/tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,

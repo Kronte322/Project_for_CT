@@ -63,12 +63,6 @@ class Projectile:
                 (round(self.rect.x) + kSizeOfProjectile // 2,
                  round(self.rect.y) + kSizeOfProjectile)):
             if self.blast_image.num_of_image >= self.blast_image.amount_of_paints * self.blast_image.frequency - 1:
-                # self.image_num = 0
-                # self.image_path = self.path + "6.png"
-                # self.image_of_projectile = pygame.image.load(self.image_path).convert_alpha()
-                # self.image_of_projectile = pygame.transform.scale(
-                #     self.image_of_projectile, (kSizeOfProjectile, kSizeOfProjectile))
-                # self.image_num_move = 8
                 return True
             self.image_of_projectile = self.blast_image.get_image()
         else:
