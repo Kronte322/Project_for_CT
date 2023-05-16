@@ -10,6 +10,8 @@ from src.back.player import Player
 from src.back.processes import OnStartProcess
 from src.back.input_processor import *
 from src.back.enemy_processor import *
+from src.back.inventory import Inventory
+from src.back.controller import Controller
 
 
 class Game:
@@ -24,7 +26,9 @@ class Game:
         mini_map = MiniMap()
         player = Player(self.window.GetDisplay(), character, map_processor.GetSpawnPosition(mini_map))
         enemy_processor = EnemyProcessor(map_processor, player)
-        render = Render(self.window.GetDisplay(), player, map_processor, mini_map, enemy_processor)
+        inventory = Inventory(player.staff.crystals)
+        controller = Controller(player, inventory)
+        render = Render(self.window.GetDisplay(), player, map_processor, mini_map, enemy_processor, inventory)
         clock = pygame.time.Clock()
         map_processor.SpawnChestInCurrentRoom()
         in_game_eventor = Eventor(player, map_processor, mini_map, enemy_processor)
@@ -38,6 +42,7 @@ class Game:
             mouse_processor.Update()
             enemy_processor.Update()
             in_game_eventor.Update()
+            controller.update(render.GetPlayerPositionOnTheScreen())
             player.update(map_processor, render)
             map_processor.UpdateCurrentRoom(player.GetStandPosition(), mini_map)
             render.Draw()

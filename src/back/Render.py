@@ -6,12 +6,13 @@ from src.back.enemy import *
 
 
 class Render:
-    def __init__(self, display, player, map_processor, mini_map, enemies_processor):
+    def __init__(self, display, player, map_processor, mini_map, enemies_processor, inventory):
         self.display = display
         self.player = player
         self.mini_map = mini_map
         self.map_processor = map_processor
         self.enemies_processor = enemies_processor
+        self.inventory = inventory
         self.position_of_player_on_the_screen = POSITION_OF_PLAYER_ON_SCREEN
         self.position_of_enemy_on_the_screen = POSITION_OF_ENEMY_ON_SCREEN
         self.moveBox = (WINDOW_SIZE[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, WINDOW_SIZE[1] // 2 - SIZE_OF_MOVE_BOX[1] // 2,
@@ -65,6 +66,9 @@ class Render:
             if self.map_processor.IsInCurrentRoom(enemy.GetPosition()):
                 self.display.blit(self.images[type(enemy)], self.GetPositionToBlit(enemy.GetPosition()))
 
+    def DrawInventory(self):
+        self.inventory.draw(self.display)
+
     def Draw(self):
         self.display.fill((37, 19, 26))
         self.DrawMap()
@@ -72,4 +76,5 @@ class Render:
         self.DrawEnemies()
         self.DrawPlayer()
         self.DrawMiniMap()
+        self.DrawInventory()
         pygame.display.flip()

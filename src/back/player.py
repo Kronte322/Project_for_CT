@@ -30,7 +30,7 @@ def normalized(vector):
 
 
 class Player:
-    def __init__(self, display, personage: Personage, spawnposition):
+    def __init__(self, display, personage: Personage, spawn_position):
         self.personage = personage
         self.image_stat = Animation(self.personage.path_stat, self.personage.num_stat,
                                     (kSizeOfCharacter, kSizeOfCharacter), self.personage.frequency)
@@ -45,7 +45,7 @@ class Player:
 
         self.image_of_character = self.image_stat.get_image()
 
-        self.rect = self.image_of_character.get_rect(topleft=spawnposition)
+        self.rect = self.image_of_character.get_rect(topleft=spawn_position)
         # self.rect = self.image_of_character.get_rect(topleft=(1920 // 2, 1080 // 2))
         display.blit(self.image_of_character, self.rect)
 
@@ -175,24 +175,26 @@ class Player:
 
         render.ChangePositionOfPlayerAccordingToMoveBox(self.direction)
 
-    def ranged_attack(self, screen_position):
-        self.left_mouse_up = not pygame.mouse.get_pressed()[0]
-        if self.left_mouse_up and self.left_mouse_down and self.magic_points >= 5:  # and (time.time()-self.last_fire_time) > 0.3
-            mouse = pygame.mouse.get_pos()
-            len_from_player = sqrt((self.rect[0] - mouse[0]) ** 2 + (self.rect[1] - mouse[1]) ** 2)
-            for i in range(self.staff.num_of_minerals):
-                self.fires.append(Projectile(self.ranged_attack_damage,
-                                             (self.rect.x, self.rect.y), mouse, len_from_player, i, self.sin_num))
-                if i != 0:
-                    self.sin_num += 1
-                    self.sin_num %= 2
+    def ranged_attack(self, screen_position, mouse):
+        # self.left_mouse_up = not pygame.mouse.get_pressed()[0]
+        if self.magic_points >= 5:  # self.left_mouse_up and
+            # mouse = pygame.mouse.get_pos()  # self.left_mouse_down and (time.time()-self.last_fire_time) > 0.3
+            len_from_player = sqrt((screen_position[0] - mouse[0]) ** 2 + (screen_position[1] - mouse[1]) ** 2)
+            for i, crystal in enumerate(self.staff.crystals):
+                if crystal is not None:
+                    self.fires.append(Projectile(self.ranged_attack_damage,
+                                                 (self.rect.x, self.rect.y), screen_position, mouse, len_from_player, i,
+                                                 self.sin_num, crystal.image_of_projectile))
+                    if i != 0:
+                        self.sin_num += 1
+                        self.sin_num %= 2
 
             self.last_fire_time = time.time()
             self.left_mouse_up = False
             # self.left_mouse_down = False
             self.magic_points -= 5
 
-        self.left_mouse_down = pygame.mouse.get_pressed()[0]
+        # self.left_mouse_down = pygame.mouse.get_pressed()[0]
 
     def melee_attack(self, rivals=None):  # display, mappa
         self.right_mouse_up = not pygame.mouse.get_pressed()[2]
@@ -297,7 +299,7 @@ class Player:
     def update(self, mappa, render, rivals=None):
         self.move(mappa, render)
         self.melee_attack(rivals)
-        self.ranged_attack(render.GetPlayerPositionOnTheScreen())
+        # self.ranged_attack(render.GetPlayerPositionOnTheScreen())
         if self.fires:
             for (i, fire) in enumerate(self.fires):
                 if fire.update(mappa):

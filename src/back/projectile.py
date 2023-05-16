@@ -1,5 +1,8 @@
 import pygame
 from math import sqrt, pi, sin
+from src.back.animation import Animation
+from src.back.images_of_proj import projectiles, ImageOfProj
+from src.back.magic_crystal import crystals
 
 kSizeOfCharacter = 48
 kSizeOfProjectile = 32
@@ -9,27 +12,27 @@ flash_path = "src/tile_sets/tiles_for_chars/ranged_attack/flash_animation/flash_
 
 
 class Projectile:
-    def __init__(self, players_damage, players_pos: tuple, aim_pos: tuple, len_from_player, num_of_mineral,
-                 sinnum, proj_path=fireball_path):
-        self.image_path = proj_path + "4.png"
-        self.path = proj_path
+    def __init__(self, players_damage, players_pos, player_pos_on_screen, aim_pos, len_from_player, num_of_mineral,
+                 sinnum, image_of_projectile: ImageOfProj):
+        self.move_image = Animation(image_of_projectile.move_path, image_of_projectile.move_num,
+                                    (kSizeOfProjectile, kSizeOfProjectile), image_of_projectile.frequency)
+        self.blast_image = Animation(image_of_projectile.blast_path, image_of_projectile.blast_num,
+                                     (kSizeOfCharacter, kSizeOfCharacter), image_of_projectile.frequency)
         # players_pos = (players_pos[0] + kSizeOfCharacter // 2, players_pos[1] + kSizeOfCharacter // 2)
         self.speed = 8
         # self.accel = 0
         self.damage = players_damage
         self.direction = (
-            (aim_pos[0] - players_pos[0]) / sqrt(
-                (players_pos[0] - aim_pos[0]) ** 2 + (players_pos[1] - aim_pos[1]) ** 2),
-            (aim_pos[1] - players_pos[1]) / sqrt(
-                (players_pos[0] - aim_pos[0]) ** 2 + (players_pos[1] - aim_pos[1]) ** 2))
+            (aim_pos[0] - player_pos_on_screen[0]) / sqrt(
+                (player_pos_on_screen[0] - aim_pos[0]) ** 2 + (player_pos_on_screen[1] - aim_pos[1]) ** 2),
+            (aim_pos[1] - player_pos_on_screen[1]) / sqrt(
+                (player_pos_on_screen[0] - aim_pos[0]) ** 2 + (player_pos_on_screen[1] - aim_pos[1]) ** 2))
         self.cur_dist = 0
         self.dist = 6000  # это просто рандомная чиселка пока что
         # self.image = pygame.Surface(
         #     (kSizeOfProjectile, kSizeOfProjectile), flags=pygame.SRCALPHA)
         # self.image.fill((0, 0, 0, 0))
-        self.image_of_projectile = pygame.image.load(self.image_path).convert_alpha()
-        self.image_of_projectile = pygame.transform.scale(
-            self.image_of_projectile, (kSizeOfProjectile, kSizeOfProjectile))
+        self.image_of_projectile = self.move_image.get_image()
         # self.image.blit(self.image_of_character, (0, 0))
         self.rect = self.image_of_projectile.get_rect(
             topleft=(players_pos[0] + self.direction[0] * 30 + (kSizeOfCharacter - kSizeOfProjectile) // 2,
@@ -59,7 +62,7 @@ class Projectile:
         if is_touch_with_rival or self.dist - self.cur_dist < 0 or not mappa.CanStandThere(
                 (round(self.rect.x) + kSizeOfProjectile // 2,
                  round(self.rect.y) + kSizeOfProjectile)):
-            if self.image_num // 2 >= 11:
+            if self.blast_image.num_of_image >= self.blast_image.amount_of_paints * self.blast_image.frequency - 1:
                 # self.image_num = 0
                 # self.image_path = self.path + "6.png"
                 # self.image_of_projectile = pygame.image.load(self.image_path).convert_alpha()
@@ -67,13 +70,7 @@ class Projectile:
                 #     self.image_of_projectile, (kSizeOfProjectile, kSizeOfProjectile))
                 # self.image_num_move = 8
                 return True
-            image_path_fire = self.path + str(
-                self.image_num // 2) + ".png"
-            self.image_of_projectile = pygame.image.load(image_path_fire).convert_alpha()
-            self.image_of_projectile = pygame.transform.scale(
-                self.image_of_projectile, (kSizeOfCharacter, kSizeOfCharacter))
-            # display.blit(image, self.rect)
-            self.image_num += 1
+            self.image_of_projectile = self.blast_image.get_image()
         else:
             # display.blit(self.image_of_projectile, self.rect)
             self.rect.x += self.direction[0] * self.speed
@@ -85,12 +82,6 @@ class Projectile:
                 self.rect.x -= self.direction[1] * delta * (-1 if self.sin_num == 0 else 1)
                 self.rect.y += self.direction[0] * delta * (-1 if self.sin_num == 0 else 1)
             self.cur_dist += self.speed
-            self.image_path = self.path + str(
-                self.image_num_move // 2 + 4) + ".png"
-            self.image_of_projectile = pygame.image.load(self.image_path).convert_alpha()
-            self.image_of_projectile = pygame.transform.scale(
-                self.image_of_projectile, (kSizeOfProjectile, kSizeOfProjectile))
-            self.image_num_move += 1
-            self.image_num_move %= 6
+            self.image_of_projectile = self.move_image.get_image()
 
         return False
