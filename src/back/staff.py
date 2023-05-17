@@ -39,6 +39,7 @@ class Staff:
 
     def blit_mineral(self, display, players_rect, diff_with_players_x_num, i):
         if self.crystals[i] is not None:
+            self.crystals[i].set_image()
             display.blit(self.crystals[i].image_of_crystal,
                          (players_rect[0] + self.diff_with_players_x[diff_with_players_x_num] +
                           list_of_coord[self.list_of_crystal_num[i] // 3][0],

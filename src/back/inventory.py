@@ -38,6 +38,9 @@ class Inventory:
         self.whole_inventory[0] = self.resources["Fire Crystal"]
         self.whole_inventory[0].amount += 1
 
+        self.whole_inventory[1] = self.resources["Ice Crystal"]
+        self.whole_inventory[1].amount += 3
+
         self.update_panel(crystals_from_player)
 
         self.crystals_panel[3] = pygame.image.load(

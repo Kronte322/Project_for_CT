@@ -10,9 +10,10 @@ class Crystal:
         self.image_of_crystal = None
 
     def set_image(self):
-        self.image_of_crystal = pygame.image.load(self.path_to_image).convert_alpha()
-        self.image_of_crystal = pygame.transform.scale(
-            self.image_of_crystal, (8, 8))
+        if self.image_of_crystal is None:
+            self.image_of_crystal = pygame.image.load(self.path_to_image).convert_alpha()
+            self.image_of_crystal = pygame.transform.scale(
+                self.image_of_crystal, (8, 8))
 
 
 crystals = []
