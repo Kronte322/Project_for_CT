@@ -233,7 +233,7 @@ class Player:
         self.right_mouse_down = pygame.mouse.get_pressed()[2]
 
     def health_icon(self, display):
-        full_hearts = self.health_points // kOneHeartInHP
+        full_hearts = int(self.health_points // kOneHeartInHP)
         is_mode_null = self.health_points % kOneHeartInHP == 0
         num_of_not_full_heart = 4 - ((self.health_points % kOneHeartInHP) * 5 // kOneHeartInHP)
         empty_hearts = self.max_health // kOneHeartInHP - full_hearts
@@ -249,7 +249,7 @@ class Player:
             display.blit(image_of_heart, (x, y))
             x += kSizeOfHeart * 5 // 4
         if not is_mode_null:
-            image_path = path_to_heart + str(num_of_not_full_heart) + ".png"
+            image_path = path_to_heart + str(int(num_of_not_full_heart)) + ".png"
             image_of_heart = pygame.image.load(image_path).convert_alpha()
             image_of_heart = pygame.transform.scale(
                 image_of_heart, (kSizeOfHeart, kSizeOfHeart))
@@ -312,3 +312,6 @@ class Player:
             for (i, fire) in enumerate(self.fires):
                 if fire.update(mappa):
                     self.fires.pop(i)
+
+    def is_alive(self):
+        return self.health_points > 0

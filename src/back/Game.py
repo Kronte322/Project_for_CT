@@ -44,5 +44,6 @@ class Game:
             in_game_eventor.Update()
             controller.update(render.GetPlayerPositionOnTheScreen())
             player.update(map_processor, render)
+            src.back.Config.RUNNING = player.is_alive()
             map_processor.UpdateCurrentRoom(player.GetStandPosition(), mini_map)
             render.Draw()

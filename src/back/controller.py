@@ -1,6 +1,8 @@
 import pygame
 from src.back.player import Player
 from src.back.inventory import Inventory
+import time
+
 
 class Controller:
     def __init__(self, player: Player, inventory: Inventory):
@@ -10,6 +12,7 @@ class Controller:
         self.left_mouse_down = False
         self.left_mouse_up = False
         # self.list_of_rects = []
+        self.last_hit = time.time()
 
     def update(self, player_on_screen_pos):
         self.left_mouse_up = not pygame.mouse.get_pressed()[0]
@@ -44,3 +47,12 @@ class Controller:
 
         self.left_mouse_down = pygame.mouse.get_pressed()[0]
         self.mouse_position = pygame.mouse.get_pos()
+
+        # self.test_hearts_for_health()
+
+    def test_hearts_for_health(self):
+        key = pygame.key.get_pressed()
+        if key[pygame.K_h] and time.time() - self.last_hit > 0.1:
+            self.player.health_points -= 50
+            self.last_hit = time.time()
+
