@@ -1,4 +1,5 @@
 import pygame
+
 from src.back.magic_crystal import crystals
 
 pygame.init()
@@ -32,14 +33,19 @@ class Inventory:
             "Ice Crystal": Resource("Ice Crystal", crystals[5])
         }
 
+        self.resources_for_chest = {
+            "Fire Crystal": Resource("Fire Crystal", crystals[0]),
+            "Light Crystal": Resource("Light Crystal", crystals[1]),
+            "Blue Fire Crystal": Resource("Blue Fire Crystal", crystals[2]),
+            "Purple Fire Crystal": Resource("Purple Fire Crystal", crystals[3]),
+            "Blood Crystal": Resource("Blood Crystal", crystals[4]),
+            "Ice Crystal": Resource("Ice Crystal", crystals[5])
+        }
+
         self.crystals_panel = [None] * 4
         self.whole_inventory = [None] * 6
 
-        self.whole_inventory[0] = self.resources["Fire Crystal"]
-        self.whole_inventory[0].amount += 1
-
-        self.whole_inventory[1] = self.resources["Ice Crystal"]
-        self.whole_inventory[1].amount += 3
+        self.chest_inventory = [None] * 6
 
         self.update_panel(crystals_from_player)
 
@@ -55,7 +61,26 @@ class Inventory:
                                       pygame.Rect(1500, 550, 80, 100), pygame.Rect(1600, 550, 80, 100),
                                       pygame.Rect(1500, 670, 80, 100), pygame.Rect(1600, 670, 80, 100)]
 
+        self.chest_inventory_rects = [pygame.Rect(50, 430, 80, 100), pygame.Rect(150, 430, 80, 100),
+                                      pygame.Rect(50, 550, 80, 100), pygame.Rect(150, 550, 80, 100),
+                                      pygame.Rect(50, 670, 80, 100), pygame.Rect(150, 670, 80, 100)]
+
         self.is_open_whole = False
+
+        self.is_open_chest_inventory = False
+
+        self.chest = None
+
+    def open_chest_inventory(self, chest):
+        self.chest = chest
+        if self.is_open_chest_inventory:
+            self.close_chest_inventory()
+        self.set_items_in_chest(chest.GetItems())
+        self.is_open_chest_inventory = True
+
+    def close_chest_inventory(self):
+        self.is_open_chest_inventory = False
+        self.clear_chest_items()
 
     def get_amount(self, name):
         try:
@@ -70,10 +95,31 @@ class Inventory:
         except KeyError:
             print("Error increasing")
 
+    def set_items_in_chest(self, list_with_names):
+        for name in list_with_names:
+            try:
+                self.resources_for_chest[name].amount += 1
+                self.update_chest_inventory()
+            except KeyError:
+                print("Error increasing")
+
+    def clear_chest_items(self):
+        for key in self.resources_for_chest:
+            self.resources_for_chest[key].amount = 0
+        self.update_chest_inventory()
+
     def decrease(self, name):
         try:
             self.resources[name].amount -= 1
             self.update_whole()
+        except KeyError:
+            print("Error increasing")
+
+    def decrease_chest(self, name):
+        try:
+            self.resources_for_chest[name].amount -= 1
+            self.update_chest_inventory()
+            self.chest.PopItem(name)
         except KeyError:
             print("Error increasing")
 
@@ -85,6 +131,15 @@ class Inventory:
         for i, resource in enumerate(self.whole_inventory):
             if resource is not None and resource.amount == 0:
                 self.whole_inventory[i] = None
+
+    def update_chest_inventory(self):
+        for name, resource in self.resources_for_chest.items():
+            if resource.amount != 0 and resource not in self.chest_inventory:
+                self.chest_inventory.insert(self.chest_inventory.index(None), resource)
+                self.chest_inventory.remove(None)
+        for i, resource in enumerate(self.chest_inventory):
+            if resource is not None and resource.amount == 0:
+                self.chest_inventory[i] = None
 
     def update_panel(self, crystals_from_player):
         for i, crystal in enumerate(crystals_from_player):
@@ -100,6 +155,13 @@ class Inventory:
             if cell is not None:
                 cell.draw(display, self.whole_inventory_rects[i].x, self.whole_inventory_rects[i].y)
 
+    def draw_chest(self, display):
+        pygame.draw.rect(display, (182, 195, 206), (30, 410, 220, 380))
+        for i, cell in enumerate(self.chest_inventory):
+            pygame.draw.rect(display, (200, 215, 227), self.chest_inventory_rects[i])
+            if cell is not None:
+                cell.draw(display, self.chest_inventory_rects[i].x, self.chest_inventory_rects[i].y)
+
     def draw_crystals(self, display):
         pygame.draw.rect(display, (182, 195, 206), (1780, 390, 120, 420))
         for i, cell in enumerate(self.crystals_panel):
@@ -114,7 +176,8 @@ class Inventory:
     def draw(self, display):
         if self.is_open_whole:
             self.draw_whole(display)
-
+        if self.is_open_chest_inventory:
+            self.draw_chest(display)
         self.draw_crystals(display)
 
     def open_whole(self):

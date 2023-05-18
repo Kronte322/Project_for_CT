@@ -42,9 +42,17 @@ class Controller:
                         self.inventory.increase(name)
                         self.inventory.update_panel(self.player.staff.crystals)
 
+            if self.inventory.is_open_chest_inventory:
+                for i, rect in enumerate(self.inventory.chest_inventory_rects):
+                    if rect.collidepoint(self.mouse_position):
+                        is_collide_with_rects = True
+                        if self.inventory.chest_inventory[i] is not None:
+                            self.inventory.increase(self.inventory.chest_inventory[i].name)
+                            self.inventory.decrease_chest(self.inventory.chest_inventory[i].name)
+
+
             if not is_collide_with_rects:
                 self.player.ranged_attack(player_on_screen_pos, self.mouse_position)
-
             self.inventory.is_open_whole = is_open_whole
 
         self.left_mouse_down = pygame.mouse.get_pressed()[0]

@@ -13,6 +13,7 @@ class Render:
         self.map_processor = map_processor
         self.enemies_processor = enemies_processor
         self.inventory = inventory
+        self.chest_inventory = inventory
         self.position_of_player_on_the_screen = POSITION_OF_PLAYER_ON_SCREEN
         self.position_of_enemy_on_the_screen = POSITION_OF_ENEMY_ON_SCREEN
         self.moveBox = (WINDOW_SIZE[0] // 2 - SIZE_OF_MOVE_BOX[0] // 2, WINDOW_SIZE[1] // 2 - SIZE_OF_MOVE_BOX[1] // 2,
@@ -79,6 +80,7 @@ class Render:
 
     def DrawInventory(self):
         self.inventory.draw(self.display)
+
 
     def Draw(self):
         self.display.fill((37, 19, 26))

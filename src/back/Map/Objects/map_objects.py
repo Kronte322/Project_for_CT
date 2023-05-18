@@ -48,7 +48,7 @@ class BasicChest(Chest):
     def __init__(self, position_on_the_map):
         super().__init__(position_on_the_map, SIZE_OF_BASIC_CHEST)
         crystal = random.choice(crystals)
-        self.AddNewItem(crystal.name())
+        self.AddNewItem(crystal.name)
 
 
 class Exit(MapObject):

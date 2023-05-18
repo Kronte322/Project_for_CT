@@ -31,7 +31,7 @@ class Game:
         render = Render(self.window.GetDisplay(), player, map_processor, mini_map, enemy_processor, inventory)
         clock = pygame.time.Clock()
         in_game_eventor = Eventor(player, map_processor, mini_map, enemy_processor)
-        mouse_processor = MouseEventProcessor(map_processor, player, render, self)
+        mouse_processor = MouseEventProcessor(map_processor, player, render, self, inventory)
         map_processor.SpawnChestInCurrentRoom(render)
         while src.back.Config.RUNNING:
             clock.tick(FPS)
