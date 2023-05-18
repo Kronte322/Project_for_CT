@@ -24,6 +24,7 @@ class Controller:
                 for i, rect in enumerate(self.inventory.whole_inventory_rects):
                     if rect.collidepoint(self.mouse_position):
                         is_collide_with_rects = True
+                        is_open_whole = True
                         if self.inventory.whole_inventory[i] is not None and self.player.staff.num_of_crystals < 3:
                             self.player.staff.add_crystal(self.inventory.whole_inventory[i].crystal)
                             self.inventory.decrease(self.inventory.whole_inventory[i].name)
@@ -33,8 +34,9 @@ class Controller:
                 if rect.collidepoint(self.mouse_position):
                     is_collide_with_rects = True
                     if i == 3:
-                        is_open_whole = True
+                        is_open_whole = not self.inventory.is_open_whole
                     if i < 3 and self.player.staff.crystals[i] is not None:
+                        is_open_whole = self.inventory.is_open_whole
                         name = self.player.staff.crystals[i].name
                         self.player.staff.delete_crystal(i)
                         self.inventory.increase(name)
