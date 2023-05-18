@@ -24,11 +24,11 @@ class Staff:
                      (players_rect[0] + self.diff_with_players_x[self.diff_with_players_x_num],
                       players_rect[1] + self.staff_y))
 
-        self.num_of_crystals = 3
+        self.num_of_crystals = 1
         self.coord_y_of_crystals = (6, 14, 26)
         self.list_of_crystal_num = [0, 10, 5]
         self.crystal_delta = [1, 1, 1]
-        self.crystals = [crystals[0], crystals[1], crystals[2]]
+        self.crystals = [crystals[0]]
 
         for i, crystal in enumerate(self.crystals):
             if crystal is not None:

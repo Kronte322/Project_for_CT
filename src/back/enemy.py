@@ -133,7 +133,7 @@ class MeleeEnemy(Enemy):
     def Attack(self, player):
         distance = math.sqrt(
             (self.rect[0] - player.rect[0]) ** 2 + (self.rect[1] - player.rect[1]) ** 2)
-        if self.slash_animation.num_of_image == 0 and (time.time() - self.last_fire_slash) > 0.3 and distance < 3 * kSizeOfCharacter:
+        if self.slash_animation.num_of_image == 0 and (time.time() - self.last_fire_slash) > 0.3 and distance < 2 * kSizeOfCharacter:
             self.last_fire_slash = time.time()
 
             image_of_slash = self.slash_animation.get_image()
