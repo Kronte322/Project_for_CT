@@ -23,13 +23,13 @@ blue_fire = ImageOfProj("src/tile_sets/tiles_for_chars/ranged_attack/blue_fire/m
 projectiles.append(blue_fire)
 
 purple_fire = ImageOfProj("src/tile_sets/tiles_for_chars/ranged_attack/purple_fire/move/sprite_", 3,
-                          "src/tile_sets/tiles_for_chars/ranged_attack/purple_fire/blast/sprite_", 11, "blue_fire", 3)
+                          "src/tile_sets/tiles_for_chars/ranged_attack/purple_fire/blast/sprite_", 11, "purple_fire", 3)
 projectiles.append(purple_fire)
 
 blood = ImageOfProj("src/tile_sets/tiles_for_chars/ranged_attack/blood/move/sprite_", 3,
-                    "src/tile_sets/tiles_for_chars/ranged_attack/blood/blast/sprite_", 11, "blue_fire", 3)
+                    "src/tile_sets/tiles_for_chars/ranged_attack/blood/blast/sprite_", 11, "blood", 3)
 projectiles.append(blood)
 
 ice_ball = ImageOfProj("src/tile_sets/tiles_for_chars/ranged_attack/ice_ball/move/sprite_", 4,
-                       "src/tile_sets/tiles_for_chars/ranged_attack/ice_ball/blast/sprite_", 6, "blue_fire", 4)
+                       "src/tile_sets/tiles_for_chars/ranged_attack/ice_ball/blast/sprite_", 6, "ice_ball", 4)
 projectiles.append(ice_ball)
