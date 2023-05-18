@@ -31,7 +31,7 @@ class Render:
     def SetImages(self):
         self.SetImage(BasicChest, PATH_TO_BASIC_CHEST, SIZE_OF_BASIC_CHEST)
         self.SetImage(Exit, PATH_TO_EXIT, SIZE_OF_TILE)
-        self.SetImage(RangeSkeleton, PATH_TO_SKELETON, SIZE_OF_SKELETON)
+        # self.SetImage(RangeSkeleton, PATH_TO_SKELETON, SIZE_OF_SKELETON)
 
     def ChangePositionOfPlayerAccordingToMoveBox(self, vector):
         self.mini_map.MoveMiniMap((-vector[0], -vector[1]))
@@ -64,7 +64,9 @@ class Render:
     def DrawEnemies(self):
         for enemy in self.enemies_processor.GetEnemies():
             if self.map_processor.IsInCurrentRoom(enemy.GetPosition()):
-                self.display.blit(self.images[type(enemy)], self.GetPositionToBlit(enemy.GetPosition()))
+                # self.display.blit(self.images[type(enemy)], self.GetPositionToBlit(enemy.GetPosition()))
+                enemy.render(self.display, self.position_of_player_on_the_screen, self.player.GetPosition(),
+                             self.map_processor)
 
     def DrawInventory(self):
         self.inventory.draw(self.display)

@@ -18,7 +18,7 @@ class Eventor:
                 vectors = {'D': (0, SIZE_OF_TILE // 4), 'U': (0, -SIZE_OF_TILE // 4), 'R': (SIZE_OF_TILE // 4, 0),
                            'L': (-SIZE_OF_TILE // 4, 0)}
                 self.map_processor.CloseDoors()
-                self.enemies_processor.SpawnInCurrentRoom(NUM_OF_ENEMIES)
+                self.enemies_processor.SpawnInCurrentRoom()
                 self.player.ChangePosition(vectors[self.map_processor.GetSideOfDoor(self.prev_position_of_player)])
                 self.mini_map.MoveMiniMap((-vectors[self.map_processor.GetSideOfDoor(self.prev_position_of_player)][0],
                                            -vectors[self.map_processor.GetSideOfDoor(self.prev_position_of_player)][1]))

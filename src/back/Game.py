@@ -40,10 +40,11 @@ class Game:
                     src.back.Config.RUNNING = False
                 mini_map.ProcessEvents(event=event)
             mouse_processor.Update()
-            enemy_processor.Update()
+            enemy_processor.Update(map_processor, player, render.GetPlayerPositionOnTheScreen())
             in_game_eventor.Update()
             controller.update(render.GetPlayerPositionOnTheScreen())
-            player.update(map_processor, render)
+            controller.test_delete_enemies(enemy_processor.GetEnemies())
+            player.update(map_processor, render, enemy_processor.GetEnemies())
             src.back.Config.RUNNING = player.is_alive() and src.back.Config.RUNNING
             map_processor.UpdateCurrentRoom(player.GetStandPosition(), mini_map)
             render.Draw()

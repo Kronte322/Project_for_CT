@@ -56,3 +56,11 @@ class Controller:
             self.player.health_points -= 50
             self.last_hit = time.time()
 
+    def test_delete_enemies(self, enemies):
+        key = pygame.key.get_pressed()
+        if key[pygame.K_h] and time.time() - self.last_hit > 0.1:
+            try:
+                enemies.pop()
+            except:
+                pass
+            self.last_hit = time.time()

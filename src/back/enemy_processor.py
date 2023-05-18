@@ -3,6 +3,7 @@ import random
 
 from src.back.Map.constants_for_map import *
 from src.back.enemy import *
+from src.back.enemy_personages import enemy_personages
 
 
 def rotate_vector(vector, angle):
@@ -23,13 +24,21 @@ class EnemyProcessor:
     def AddEnemy(self, enemy):
         self.enemies.append(enemy)
 
-    def SpawnInCurrentRoom(self, num_of_enemies):
+    def SpawnInCurrentRoom(self):
         tiles = self.map_processor.GetCurrentRoom().GetCoordinatesOfTiles()
-        for i in range(num_of_enemies):
+        random_num_of_enemies = random.randint(5, 10)
+        for i in range(random_num_of_enemies):
             while True:
                 position = random.choice(tiles)
                 if self.map_processor.CanStandThere([position[0] * SIZE_OF_TILE, position[1] * SIZE_OF_TILE]):
-                    self.AddEnemy(RangeSkeleton([position[0] * SIZE_OF_TILE, position[1] * SIZE_OF_TILE]))
+                    enemy_personage = random.choice(enemy_personages)
+                    is_range = random.randint(0, 1)
+                    if is_range == 0:
+                        self.AddEnemy(
+                            RangeEnemy([position[0] * SIZE_OF_TILE, position[1] * SIZE_OF_TILE], enemy_personage))
+                    else:
+                        self.AddEnemy(
+                            MeleeEnemy([position[0] * SIZE_OF_TILE, position[1] * SIZE_OF_TILE], enemy_personage))
                     break
 
     def CheckIfCanMove(self, enemy, vector):
@@ -48,21 +57,24 @@ class EnemyProcessor:
             first_cos = x_coord / hypotenuse
             second_cos = y_coord / hypotenuse
             vector_of_movement = (
-                SPEED_OF_ENEMY * first_cos, SPEED_OF_ENEMY * second_cos)
+                enemy.speed * first_cos, enemy.speed * second_cos)
         vector_of_movement = rotate_vector(vector_of_movement, math.radians(random.randint(-45, 45)))
         enemy.SetDirectionOfMovement(vector_of_movement, NUM_OF_FRAMES_WITH_MOVEMENT)
         return vector_of_movement
 
-    def Update(self):
-        for enemy in self.enemies:
+    def Update(self, map_processor, player, player_pos_on_screen):
+        for i, enemy in enumerate(self.enemies):
             if enemy.IsMove():
                 if self.CheckIfCanMove(enemy, enemy.GetDirectionOfMovement()):
-                    enemy.Move()
+                    enemy.SleepMove()
                 else:
                     enemy.StopMovement()
             else:
                 while True:
                     self.GenerateNewMovement(enemy, enemy.GetDirectionOfMovement())
                     if self.CheckIfCanMove(enemy, enemy.GetDirectionOfMovement()):
-                        enemy.Move()
+                        enemy.SleepMove()
                         break
+            enemy.update(map_processor, player, player_pos_on_screen)
+            if not enemy.IsAlive():
+                self.enemies.pop(i)

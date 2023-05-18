@@ -1,7 +1,7 @@
 class Personage:
     def __init__(self, path_stat, path_stat_left, num_stat, path_down, num_down, path_up, num_up, path_right, num_right,
                  path_left,
-                 num_left, path_icon, name, recom_freq=3):
+                 num_left, path_icon, name, recom_freq=3, path_death_left=None, path_death_right=None, num_death=None):
         self.path_stat = path_stat
         self.path_stat_left = path_stat_left
         self.num_stat = num_stat
@@ -16,6 +16,9 @@ class Personage:
         self.path_icon = path_icon
         self.name = name
         self.frequency = recom_freq
+        self.path_death_left = path_death_left
+        self.path_death_right = path_death_right
+        self.num_death = num_death
 
 
 personages = []
@@ -123,7 +126,9 @@ skeleton_warior = Personage("src/tile_sets/tiles_for_chars/personages/skeleton_w
                             "src/tile_sets/tiles_for_chars/personages/skeleton_warior/right/sprite_", 4,
                             "src/tile_sets/tiles_for_chars/personages/skeleton_warior/left/sprite_", 4,
                             "src/tile_sets/tiles_for_chars/personages/skeleton_warior/skeleton_warior.png",
-                            "skeleton_warior", 5)
+                            "skeleton_warior", 5,
+                            "src/tile_sets/tiles_for_chars/personages/skeleton_warior/death_left/sprite_",
+                            "src/tile_sets/tiles_for_chars/personages/skeleton_warior/death_right/sprite_", 4)
 
 personages.append(skeleton_warior)
 
@@ -135,7 +140,9 @@ goblin = Personage(
     "src/tile_sets/tiles_for_chars/personages/goblin/right/sprite_", 8,
     "src/tile_sets/tiles_for_chars/personages/goblin/left/sprite_", 8,
     "src/tile_sets/tiles_for_chars/personages/goblin/goblin.png",
-    "goblin", 6)
+    "goblin", 6,
+    "src/tile_sets/tiles_for_chars/personages/goblin/death_left/sprite_",
+    "src/tile_sets/tiles_for_chars/personages/goblin/death_right/sprite_", 4)
 
 personages.append(goblin)
 
@@ -146,7 +153,9 @@ mushroom = Personage("src/tile_sets/tiles_for_chars/personages/mushroom/stat/spr
                      "src/tile_sets/tiles_for_chars/personages/mushroom/right/sprite_", 8,
                      "src/tile_sets/tiles_for_chars/personages/mushroom/left/sprite_", 8,
                      "src/tile_sets/tiles_for_chars/personages/mushroom/mushroom.png",
-                     "mushroom", 6)
+                     "mushroom", 6,
+                     "src/tile_sets/tiles_for_chars/personages/mushroom/death_left/sprite_",
+                     "src/tile_sets/tiles_for_chars/personages/mushroom/death_right/sprite_", 4)
 
 personages.append(mushroom)
 
@@ -157,6 +166,8 @@ flying_eye = Personage("src/tile_sets/tiles_for_chars/personages/flying_eye/righ
                        "src/tile_sets/tiles_for_chars/personages/flying_eye/right/sprite_", 7,
                        "src/tile_sets/tiles_for_chars/personages/flying_eye/left/sprite_", 7,
                        "src/tile_sets/tiles_for_chars/personages/flying_eye/flying_eye.png",
-                       "flying_eye", 8)
+                       "flying_eye", 8,
+                       "src/tile_sets/tiles_for_chars/personages/flying_eye/death_left/sprite_",
+                       "src/tile_sets/tiles_for_chars/personages/flying_eye/death_right/sprite_", 4)
 
 personages.append(flying_eye)

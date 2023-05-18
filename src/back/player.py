@@ -16,6 +16,7 @@ kOneHeartInHP = 200
 kSizeOfHeart = 24
 path_to_heart = "src/tile_sets/tiles_for_chars/hearts/heart_"
 path_to_skeleton = "src/tile_sets/tiles_for_chars/personages/skeleton/skeleton_"
+path_to_slash = "src/tile_sets/tiles_for_chars/slash/slash_"
 
 
 def norm(vector):
@@ -56,24 +57,22 @@ class Player:
         # self.acceleration = 2  # ускорение
         self.direction = [0, 0]  # направление
 
-        self.melee_attack_damage = 2  # урон ближней атакой
-        self.ranged_attack_damage = 0  # урон дальней атакой
+        self.melee_attack_damage = 50  # урон ближней атакой
+        self.ranged_attack_damage = 20  # урон дальней атакой
         self.max_health = 1000
         self.health_points = self.max_health
         self.health_recovery = 0.2
-        self.max_magic = 10000
+        self.max_magic = 100
         self.magic_points = self.max_magic
         self.magic_recovery = 0.05
 
-        self.slash_num = 0
         self.last_fire_slash = 0
         self.right_mouse_down = False
         self.right_mouse_up = False
+        self.slash_animation = Animation(path_to_slash, 15, (2 * kSizeOfCharacter, 2 * kSizeOfCharacter), 1)
 
         self.fires = []  # список еще не долетевших до цели выстрелов
         self.last_fire_time = 0  # чтобы сделать ограничение на кол-во выстрелов по времени
-        self.left_mouse_down = False  # это либо будет полем игрока, либо глобальгной переменной
-        self.left_mouse_up = False  # это либо будет полем игрока, либо глобальгной переменной
 
         self.staff = Staff("src/tile_sets/tiles_for_chars/staff/staff.png", self.rect, display)
         self.sin_num = 0
@@ -207,20 +206,16 @@ class Player:
     def melee_attack(self, rivals=None):  # display, mappa
         self.right_mouse_up = not pygame.mouse.get_pressed()[2]
 
-        if self.slash_num == 0 and self.right_mouse_up and self.right_mouse_down and \
+        if self.slash_animation.num_of_image == 0 and self.right_mouse_up and self.right_mouse_down and \
                 (time.time() - self.last_fire_slash) > 0.3:
             self.right_mouse_up = False
             # self.right_mouse_down = False
             self.last_fire_slash = time.time()
 
-            slash_path = "src/tile_sets/tiles_for_chars/slash/slash_0.png"
-            image_of_slash = pygame.image.load(slash_path).convert_alpha()
-            image_of_slash = pygame.transform.scale(
-                image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
+            image_of_slash = self.slash_animation.get_image()
             slash_rect = image_of_slash.get_rect(
-                topleft=(self.rect[0] - kSizeOfCharacter // 4, self.rect[1] - kSizeOfCharacter // 4))
+                topleft=(self.rect[0] - kSizeOfCharacter // 2, self.rect[1] - kSizeOfCharacter // 2))
             # display.blit(image_of_slash, slash_rect)
-            self.slash_num += 1
 
             if rivals is None or not rivals:
                 return
@@ -228,7 +223,7 @@ class Player:
                 for rival in rivals:
                     if slash_rect.colliderect(rival.rect):
                         # тут будет передаваться урон мобу
-                        pass
+                        rival.Hurt(self.melee_attack_damage)
 
         self.right_mouse_down = pygame.mouse.get_pressed()[2]
 
@@ -295,23 +290,21 @@ class Player:
                 if fire.render(display, position, (self.rect.x, self.rect.y), mappa):
                     self.fires.pop(i)
 
-        elif self.slash_num > 0:
-            slash_path = "src/tile_sets/tiles_for_chars/slash/slash_" + str(self.slash_num) + ".png"
-            image_of_slash = pygame.image.load(slash_path).convert_alpha()
-            image_of_slash = pygame.transform.scale(
-                image_of_slash, (1.5 * kSizeOfCharacter, 1.5 * kSizeOfCharacter))
-            display.blit(image_of_slash, (position[0] - kSizeOfCharacter // 4, position[1] - kSizeOfCharacter // 4))
-            self.slash_num += 1
-            self.slash_num %= 15
+        if self.slash_animation.num_of_image > 0:
+            image_of_slash = self.slash_animation.get_image()
+            display.blit(image_of_slash, (position[0] - kSizeOfCharacter // 2, position[1] - kSizeOfCharacter // 2))
 
     def update(self, mappa, render, rivals=None):
         self.move(mappa, render)
         self.melee_attack(rivals)
         # self.ranged_attack(render.GetPlayerPositionOnTheScreen())
         if self.fires:
-            for (i, fire) in enumerate(self.fires):
-                if fire.update(mappa):
+            for i, fire in enumerate(self.fires):
+                if fire.update(mappa, rivals):
                     self.fires.pop(i)
 
     def is_alive(self):
         return self.health_points > 0
+
+    def Hurt(self, damage):
+        self.health_points -= damage

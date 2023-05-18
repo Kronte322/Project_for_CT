@@ -43,6 +43,7 @@ class Projectile:
 
         self.num_of_mineral = num_of_mineral
         self.sin_num = sinnum
+        self.is_touch_with_rival = False
 
     def render(self, display, screen_position, map_position, mappa):
         if mappa.IsInCurrentRoom((self.rect.x, self.rect.y)):
@@ -51,17 +52,16 @@ class Projectile:
                 self.rect[1] - map_position[1] + screen_position[1]))
 
     def update(self, mappa, rivals=None):
-        is_touch_with_rival = False
-
         if rivals is None or rivals == []:
             rivals = []
-        else:
+        elif not self.is_touch_with_rival:
             for rival in rivals:
                 if self.rect.colliderect(rival.rect):
-                    is_touch_with_rival = True
+                    self.is_touch_with_rival = True
                     # тут будет вызываться команда от rival, которая нанесет ему урон (дебафф)
+                    rival.Hurt(self.damage)
 
-        if is_touch_with_rival or self.dist - self.cur_dist < 0 or not mappa.CanStandThere(
+        if self.is_touch_with_rival or self.dist - self.cur_dist < 0 or not mappa.CanStandThere(
                 (round(self.rect.x) + kSizeOfProjectile // 2,
                  round(self.rect.y) + kSizeOfProjectile)):
             if self.blast_image.num_of_image >= self.blast_image.amount_of_paints * self.blast_image.frequency - 1:
