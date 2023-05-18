@@ -51,6 +51,9 @@ class Render:
     def DrawPlayer(self):
         self.player.render(self.display, self.position_of_player_on_the_screen, self.map_processor)
 
+    def DrawChestInventory(self, chest):
+        items = chest.GetItems()
+
     def DrawMapObjects(self):
         for obj in self.map_processor.GetObjects():
             if self.map_processor.IsInCurrentRoom(obj.GetPosition()):
