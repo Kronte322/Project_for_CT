@@ -13,7 +13,7 @@ class MouseEventProcessor:
         self.actions = {Exit: self.ExitAction, BasicChest: self.ChestAction}
 
     def ExitAction(self, obj):
-        self.game.StartGameSession(self.player.GetPersonage())
+        self.game.EnterNewLevel()
 
     def ChestAction(self, obj):
         self.inventory.open_chest_inventory(obj)

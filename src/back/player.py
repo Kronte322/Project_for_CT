@@ -64,7 +64,7 @@ class Player:
         self.health_recovery = 0.2
         self.max_magic = 100
         self.magic_points = self.max_magic
-        self.magic_recovery = 0.05
+        self.magic_recovery = 0.15
 
         self.last_fire_slash = 0
         self.right_mouse_down = False
@@ -81,6 +81,10 @@ class Player:
         self.image_of_icon = pygame.image.load(self.path_to_icon).convert_alpha()
         self.image_of_icon = pygame.transform.scale(
             self.image_of_icon, (kSizeOfCharacter, kSizeOfCharacter))
+
+    def SetPosition(self, position):
+        self.rect.x = position[0]
+        self.rect.y = position[1]
 
     def GetPersonage(self):
         return self.personage
@@ -199,7 +203,7 @@ class Player:
             self.last_fire_time = time.time()
             self.left_mouse_up = False
             # self.left_mouse_down = False
-            # self.magic_points -= 5
+            self.magic_points -= 5
 
         # self.left_mouse_down = pygame.mouse.get_pressed()[0]
 
@@ -307,5 +311,5 @@ class Player:
         return self.health_points > 0
 
     def Hurt(self, damage):
-        # self.health_points -= damage
+        self.health_points -= damage
         pass
