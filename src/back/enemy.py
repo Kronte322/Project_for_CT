@@ -130,8 +130,10 @@ class MeleeEnemy(Enemy):
         self.slash_animation = Animation(path_to_slash, 15, (2 * self.size, 2 * self.size), 1)
         self.melee_attack_damage = 50
 
-    def Attack(self, rivals=None):
-        if self.slash_animation.num_of_image == 0 and (time.time() - self.last_fire_slash) > 0.3:
+    def Attack(self, player):
+        distance = math.sqrt(
+            (self.rect[0] - player.rect[0]) ** 2 + (self.rect[1] - player.rect[1]) ** 2)
+        if self.slash_animation.num_of_image == 0 and (time.time() - self.last_fire_slash) > 0.3 and distance < 3 * kSizeOfCharacter:
             self.last_fire_slash = time.time()
 
             image_of_slash = self.slash_animation.get_image()
@@ -139,13 +141,9 @@ class MeleeEnemy(Enemy):
                 topleft=(self.rect[0] - self.size // 2, self.rect[1] - self.size // 2))
             # display.blit(image_of_slash, slash_rect)
 
-            if rivals is None or not rivals:
-                return
-            else:
-                for rival in rivals:
-                    if slash_rect.colliderect(rival.rect):
-                        # тут будет передаваться урон мобу
-                        rival.Hurt(self.melee_attack_damage)
+            if slash_rect.colliderect(player.rect):
+                # тут будет передаваться урон мобу
+                player.Hurt(self.melee_attack_damage)
 
     def render(self, display, player_pos_on_screen, player_pos, mappa):
         super().render(display, player_pos_on_screen, player_pos, mappa)
@@ -156,7 +154,7 @@ class MeleeEnemy(Enemy):
             display.blit(image_of_slash, (position[0] - self.size // 2, position[1] - self.size // 2))
 
     def update(self, mappa, player, player_pos_on_screen):
-        self.Attack([player])
+        self.Attack(player)
 
 
 class RangeEnemy(Enemy, ABC):
