@@ -6,14 +6,24 @@ import random
 
 
 class MapProcessor:
-    def __init__(self):
+    def __init__(self, mini_map):
         self.map = None
+        self.mini_map = mini_map
         self.start_room = None
         self.finish_room = None
         self.current_room = None
         self.visited_rooms = []
         self.objects = []
         self.ConstructMap(SIZE_OF_MAP)
+
+    def GetVisitedRooms(self):
+        return self.visited_rooms
+
+    def GetStartRoom(self):
+        return self.start_room
+
+    def GetFinishRoom(self):
+        return self.finish_room
 
     def RedrawCurrentRoom(self):
         self.current_room.RedrawDoors(self.map.GetMatrix())
@@ -41,12 +51,13 @@ class MapProcessor:
         self.start_room = self.map.GetStartRoom()
         self.finish_room = self.map.GetFinishRoom(self.start_room)
 
-    def GenerateExit(self):
+    def GenerateExit(self, render):
         list_with_tiles = self.finish_room.GetCoordinatesOfTiles()
         while True:
             coord = random.choice(list_with_tiles)
             if self.finish_room.GetTile(coord) in [CHAR_FOR_FLOOR]:
                 self.AddObject(Exit((coord[0] * SIZE_OF_TILE, coord[1] * SIZE_OF_TILE)))
+                render.BlitItemOnMiniMap(Exit, (coord[0] * SIZE_OF_TILE, coord[1] * SIZE_OF_TILE))
                 break
 
     def GetTilesOfCurrentRoom(self):
@@ -83,10 +94,11 @@ class MapProcessor:
         else:
             raise "when close door, current room is not room"
 
-    def SpawnChest(self, position):
+    def SpawnChest(self, position, render):
         self.AddObject(BasicChest(position))
+        render.BlitItemOnMiniMap(BasicChest, position)
 
-    def SpawnChestInCurrentRoom(self):
+    def SpawnChestInCurrentRoom(self, render):
         if not self.current_room:
             raise "current room is empty"
 
@@ -94,5 +106,5 @@ class MapProcessor:
         while True:
             coord = random.choice(list_with_tiles)
             if self.current_room.GetTile(coord) in [CHAR_FOR_FLOOR]:
-                self.SpawnChest((coord[0] * SIZE_OF_TILE, coord[1] * SIZE_OF_TILE))
+                self.SpawnChest((coord[0] * SIZE_OF_TILE, coord[1] * SIZE_OF_TILE), render)
                 break

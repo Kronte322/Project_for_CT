@@ -1,5 +1,6 @@
 import random
 import time
+
 from src.back.Map.constants_for_map import *
 
 random.seed(time.time())
@@ -34,7 +35,6 @@ class MapBuilder:
                 return 'R'
             elif main_matrix[position[0] + 1][position[1]] is CHAR_FOR_PATH:
                 return 'L'
-
 
     @staticmethod
     def IsItWallForDoor(main_matrix, position: tuple):
@@ -1060,6 +1060,15 @@ class DFSAlgoForMapBuilder:
         self.used[vertex] = True
         self.path.append(vertex)
         final_matrix.append((vertex, MapBuilder.GetTile(main_matrix, vertex)))
+        if flag == 'room' and MapBuilder.GetTile(main_matrix,
+                                                 vertex) in SET_WITH_WALLS:
+            for i in MapBuilder.GetNeighbours(main_matrix, vertex):
+                if self.used.get(i) is None and i != self.parents.get(vertex):
+                    if MapBuilder.GetTile(main_matrix,
+                                                 i) in SET_WITH_WALLS:
+                        self.path.append(i)
+                        final_matrix.append((i, MapBuilder.GetTile(main_matrix, i)))
+            return
         if current_depth >= depth:
             return
         for i in MapBuilder.GetNeighbours(main_matrix, vertex):

@@ -22,17 +22,17 @@ class Game:
         OnStartProcess(self.window.GetDisplay(), self)
 
     def StartGameSession(self, character):
-        map_processor = MapProcessor()
         mini_map = MiniMap()
+        map_processor = MapProcessor(mini_map)
         player = Player(self.window.GetDisplay(), character, map_processor.GetSpawnPosition(mini_map))
         enemy_processor = EnemyProcessor(map_processor, player)
         inventory = Inventory(player.staff.crystals)
         controller = Controller(player, inventory)
         render = Render(self.window.GetDisplay(), player, map_processor, mini_map, enemy_processor, inventory)
         clock = pygame.time.Clock()
-        map_processor.SpawnChestInCurrentRoom()
         in_game_eventor = Eventor(player, map_processor, mini_map, enemy_processor)
         mouse_processor = MouseEventProcessor(map_processor, player, render, self)
+        map_processor.SpawnChestInCurrentRoom(render)
         while src.back.Config.RUNNING:
             clock.tick(FPS)
             for event in pygame.event.get():
@@ -41,10 +41,12 @@ class Game:
                 mini_map.ProcessEvents(event=event)
             mouse_processor.Update()
             enemy_processor.Update(map_processor, player, render.GetPlayerPositionOnTheScreen())
-            in_game_eventor.Update()
-            controller.update(render.GetPlayerPositionOnTheScreen())
+            in_game_eventor.Update(render)
+            controller.update(render.CenterOfPlayerPosition())
             controller.test_delete_enemies(enemy_processor.GetEnemies())
             player.update(map_processor, render, enemy_processor.GetEnemies())
-            src.back.Config.RUNNING = player.is_alive() and src.back.Config.RUNNING
+            if not player.is_alive() and src.back.Config.RUNNING:
+                self.StartGame()
+            # src.back.Config.RUNNING = player.is_alive() and src.back.Config.RUNNING
             map_processor.UpdateCurrentRoom(player.GetStandPosition(), mini_map)
             render.Draw()

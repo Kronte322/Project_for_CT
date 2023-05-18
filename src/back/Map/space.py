@@ -48,6 +48,9 @@ class RoomSpace(Space):
         self.surface = src.back.Map.map.Map.GetSurface(self.tiles)
         self.doors = doors
 
+    def IsDoorsClosed(self):
+        return list(self.doors.values())[0] is CHAR_FOR_CLOSED_DOOR
+
     def GetSurface(self):
         return self.surface
 
@@ -55,12 +58,14 @@ class RoomSpace(Space):
         return self.doors
 
     def RedrawDoors(self, main_matrix):
+        interm = []
         for i in range(len(self.tiles)):
             cop = self.doors.copy()
             if self.tiles[i][0] in cop:
                 self.tiles[i] = (self.tiles[i][0], main_matrix[self.tiles[i][0][0]][self.tiles[i][0][1]])
+                interm.append((self.tiles[i][0], main_matrix[self.tiles[i][0][0]][self.tiles[i][0][1]]))
                 self.doors[self.tiles[i][0]] = main_matrix[self.tiles[i][0][0]][self.tiles[i][0][1]]
-        self.surface = src.back.Map.map.Map.GetSurface(self.tiles)
+        self.surface = src.back.Map.map.Map.RedrawSurface(self.surface, interm, self.left_upper_corner)
 
 
 class PathSpace(Space):

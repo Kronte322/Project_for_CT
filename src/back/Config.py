@@ -17,17 +17,16 @@ POSITION_OF_ENEMY_ON_SCREEN = [WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]
 SIZE_OF_MENUS = [WINDOW_SIZE[0] // 2, WINDOW_SIZE[1] // 2]
 
 SIZE_OF_MINI_MAP = (WINDOW_SIZE[1] // 3, WINDOW_SIZE[1] // 3)
-SIZE_OF_TABED_MINIMAP = [WINDOW_SIZE[0] * 0.6, WINDOW_SIZE[1] * 0.6]
+SIZE_OF_TABED_MINIMAP = [WINDOW_SIZE[0], WINDOW_SIZE[1]]
 
 # positions
 POSITION_OF_MINI_MAP = [WINDOW_SIZE[0] - SIZE_OF_MINI_MAP[0], 0]
 POSITION_OF_TABED_MINIMAP = [(WINDOW_SIZE[0] - SIZE_OF_TABED_MINIMAP[0]) // 2,
                              (WINDOW_SIZE[1] - SIZE_OF_TABED_MINIMAP[1]) // 2]
 
-CHARACTERS = [('skeleton', skeleton), ('hooded_protogonist', hooded_protogonist), ('wizard', wizard),
+CHARACTERS = [('hooded_protogonist', hooded_protogonist), ('wizard', wizard),
               ('knight', knight), ('magic_wizard', magic_wizard), ('fantasy_warior', fantasy_warior),
-              ('huntress', huntress), ('warior', warior), ('king', king), ('skeleton_warior', skeleton_warior),
-              ('goblin', goblin), ('mushroom', mushroom), ('flying_eye', flying_eye)]
+              ('huntress', huntress), ('warior', warior), ('king', king)]
 
 # strings for UI
 CAPTION = 'Isac'

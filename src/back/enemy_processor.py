@@ -18,6 +18,9 @@ class EnemyProcessor:
         self.player = player
         self.enemies = []
 
+    def IsAllDead(self):
+        return len(self.enemies) == 0
+
     def GetEnemies(self):
         return self.enemies
 

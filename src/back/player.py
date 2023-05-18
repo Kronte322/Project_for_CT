@@ -199,7 +199,7 @@ class Player:
             self.last_fire_time = time.time()
             self.left_mouse_up = False
             # self.left_mouse_down = False
-            self.magic_points -= 5
+            # self.magic_points -= 5
 
         # self.left_mouse_down = pygame.mouse.get_pressed()[0]
 
@@ -307,4 +307,5 @@ class Player:
         return self.health_points > 0
 
     def Hurt(self, damage):
-        self.health_points -= damage
+        # self.health_points -= damage
+        pass

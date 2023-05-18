@@ -3,6 +3,7 @@ from src.back.constants_with_paths_to_files import *
 from src.back.Map.map import Map
 from src.back.Map.constants_for_map import *
 from src.back.Config import *
+import math
 
 
 class MiniMap:
@@ -19,6 +20,12 @@ class MiniMap:
         self.position_of_minimap_on_screen = POSITION_OF_MINI_MAP
         self.size_of_mini_map = SIZE_OF_MINI_MAP
         self.is_tabed = False
+
+    def BlitImageOnMiniMap(self, image, position_on_the_map):
+        position = [math.ceil(position_on_the_map[0] * MINI_MAP_SCALE),
+                    math.ceil(position_on_the_map[1] * MINI_MAP_SCALE)]
+        image = pygame.transform.scale(image, (SIZE_OF_ITEM_ON_MINI_MAP, SIZE_OF_ITEM_ON_MINI_MAP))
+        self.map_for_minimap.blit(image, position)
 
     def BlitOnMiniMap(self, tiles_for_blit):
         Map.BlitSpecificTilesOnSurface(self.map_for_minimap, tiles_for_blit, SIZE_OF_TILE_ON_MINI_MAP)

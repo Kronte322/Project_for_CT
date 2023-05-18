@@ -23,6 +23,12 @@ class Render:
     def GetPlayerPositionOnTheScreen(self):
         return self.position_of_player_on_the_screen
 
+    def CenterOfPlayerPosition(self):
+        return [self.position_of_player_on_the_screen[0] + 48 // 2, self.position_of_player_on_the_screen[1] + 48 // 2]
+
+    def BlitItemOnMiniMap(self, item, position):
+        self.mini_map.BlitImageOnMiniMap(self.images[item], position)
+
     def SetImage(self, tp, path, size):
         image = pygame.image.load(path)
         image = pygame.transform.scale(image, (size, size))

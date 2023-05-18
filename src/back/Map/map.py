@@ -189,6 +189,14 @@ class Map:
         return right_down_corner
 
     @staticmethod
+    def RedrawSurface(surface, list_with_tiles, left_upper_corner):
+        interm_with_tiles = []
+        for tile in list_with_tiles:
+            interm_with_tiles.append(((tile[0][0] - left_upper_corner[0], tile[0][1] - left_upper_corner[1]), tile[1]))
+        Map.BlitSpecificTilesOnSurface(surface, interm_with_tiles, left_upper_corner=left_upper_corner)
+        return surface
+
+    @staticmethod
     def GetSurface(list_with_tiles):
         left_upper_corner = Map.GetLeftUpperCornerForListOfTiles(list_with_tiles)
         right_down_corner = Map.GetRightDownCornerForListOfTiles(list_with_tiles)
